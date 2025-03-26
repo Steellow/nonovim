@@ -1,81 +1,133 @@
 <head>
     <style>
-        table {
-            margin: 20px;
+        /* Reset or basic styles */
+        body {
+            font-family: sans-serif;
         }
 
+        table,
+        td {
+            border-collapse: collapse;
+        }
+
+        /* Keep collapse */
+
+        /* Container holds everything */
         .container {
-            padding-left: 50px;
-            padding-top: 50px;
             position: relative;
-            margin: 100px
+            /* Crucial for absolute positioning of children */
+            /* padding-top, padding-left, and margin will be set inline */
+            /* border: 1px dashed gray; */
+            /* Optional: for debugging */
         }
 
+        /* Column Titles container */
         .column-titles {
             position: absolute;
-            top: 0;
-            left: 50px;
+            /* top, left, height set inline */
             display: flex;
-            gap: 0;
-            height: 50px;
+            /* Add border to separate from table cells */
+            border-bottom: 1px solid black;
+            box-sizing: border-box;
+            /* background-color: rgba(255,0,0,0.1); */
+            /* Debugging */
         }
 
+        /* Individual Column Title */
         .column-title {
-            width: 50px;
+            /* width set inline (cellSize) */
+            height: 100%;
+            /* Takes height from .column-titles container */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
             border-right: 1px solid black;
+            box-sizing: border-box;
+            /* Width includes border/padding */
             padding: 5px;
-            font-size: 24px;
+            font-size: 18px;
+            /* Smaller font might be needed */
             font-weight: bold;
+            overflow: hidden;
         }
 
         .column-title:last-child {
             border-right: none;
+            /* No border on the far right */
         }
 
+        /* Row Titles container */
         .row-titles {
             position: absolute;
-            left: 0;
-            top: 69px;
-            /* Adjusted to align better with default cell size + padding/border */
+            /* top, left, width set inline */
             display: flex;
             flex-direction: column;
+            /* Add border to separate from table cells */
+            border-right: 1px solid black;
+            box-sizing: border-box;
+            /* background-color: rgba(0,255,0,0.1); */
+            /* Debugging */
         }
 
+        /* Individual Row Title */
         .row-title {
-            height: 50px;
-            /* Match cell size */
+            /* height set inline (cellSize) */
+            width: 100%;
+            /* Takes width from .row-titles container */
             display: flex;
             align-items: center;
-            padding: 0 5px;
-            margin-left: 20px;
+            justify-content: flex-end;
+            /* Align text to the right */
             border-bottom: 1px solid black;
-            font-size: 24px;
-            font-weight: bold;
             box-sizing: border-box;
-            /* Include padding/border in height */
+            /* Height includes border/padding */
+            padding: 0 5px;
+            font-size: 18px;
+            font-weight: bold;
+            overflow: hidden;
         }
 
         .row-title:last-child {
             border-bottom: none;
+            /* No border at the very bottom */
         }
 
-        table,
-        td {
-            border: 1px solid black;
+        /* Style for highlighted titles */
+        .highlighted-title {
+            background-color: #e8e849;
+            /* Light yellow background */
+            /* You could also add other styles like: */
+            /* font-weight: bolder; */
+            /* transition: background-color 0.1s ease-in-out; */
+            /* Optional smooth transition */
+        }
+
+        /* Table - positioned by container padding */
+        table {
             border-collapse: collapse;
+            /* border-top and border-left needed to complete the box */
+            /* These will align with the bottom/right borders of the title containers */
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            margin: 0;
+            /* Remove default table margin */
+            /* background-color: rgba(0,0,255,0.1); */
+            /* Debugging */
         }
 
+        /* Table Cell */
         td {
+            /* height, width set inline (cellSize) */
+            border: 1px solid black;
             position: relative;
+            /* For focus pseudo-element */
             box-sizing: border-box;
+            /* Critical for size including border */
             padding: 0;
-            /* overflow: hidden; */
         }
 
+        /* Cell Content Styles (Unchanged) */
         .filled {
             background-color: #2d2d2d;
             width: 100%;
@@ -90,22 +142,19 @@
             width: 100%;
             font-size: large;
             color: #555;
-            /* Lighter cross color */
         }
 
+        /* Focus Style (Unchanged) */
         td.focused::after {
             content: '';
             position: absolute;
             top: -3px;
-            /* Adjusted for better visual alignment */
             left: -3px;
             right: -3px;
             bottom: -3px;
             border: 3px solid red;
-            /* Slightly thinner border */
             z-index: 1;
             pointer-events: none;
-            /* Allow clicks to pass through */
         }
     </style>
 </head>
@@ -117,10 +166,16 @@
         const columnNumbers = ["1", "6", "1", "2"];
         const rowNumbers = ["2", "1", "1", "1", "3", "1 1"];
 
+
         // Settings
         const width = columnNumbers.length;
         const height = rowNumbers.length;
-        const cellSize = 50;
+        const cellSize = 50; // Change this value to test scaling
+        const colTitleHeight = 50; // How tall the column title area is
+        const rowTitleWidth = 50;  // How wide the row title area is
+        const outerMargin = 50; // Margin around the whole puzzle
+
+
 
         const state = {
             x: 0, // Represents column index
@@ -136,36 +191,79 @@
         const Grid = {
             // No need for oncreate/onremove if using a global listener below
             // that calls Grid.handleKeyPress directly.
-
             view: function (vnode) {
-                return m("div.container",
+                // --- Calculate Styles ---
+
+                // Container needs padding for titles and outer margin
+                const containerStyle = {
+                    paddingTop: `${colTitleHeight}px`,
+                    paddingLeft: `${rowTitleWidth}px`,
+                    margin: `${outerMargin}px` // Use the constant for outer margin
+                };
+
+                // Column titles positioned at top-left corner of the PADDED area
+                const colTitlesStyle = {
+                    top: '0px', // Align to container's top edge
+                    left: `${rowTitleWidth}px`, // Start after the row title space
+                    height: `${colTitleHeight}px` // Use constant height
+                    // border-bottom is in CSS
+                };
+
+                // Row titles positioned below col titles, at left edge
+                const rowTitlesStyle = {
+                    top: `${colTitleHeight}px`, // Start below the column title space
+                    left: '0px', // Align to container's left edge
+                    width: `${rowTitleWidth}px` // Use constant width
+                    // border-right is in CSS
+                };
+                return m("div.container", { style: containerStyle },
                     [
-                        m("div.column-titles", { style: { left: (50 + 20) + 'px' } }, // Adjust left offset based on row title area
-                            columnNumbers.map((title, i) =>
-                                m("div.column-title", { style: { width: cellSize + 'px', height: '50px' } }, // Set width explicitly
+                        // Column Titles Area (Absolute)
+                        m("div.column-titles", { style: colTitlesStyle },
+                            columnNumbers.map((title, colIndex) => // Get column index 'colIndex'
+                                m("div.column-title", // Base class
+                                    {
+                                        // Set width based on cellSize
+                                        style: { width: `${cellSize}px` },
+                                        // Conditionally add highlight class
+                                        class: colIndex === state.x ? 'highlighted-title' : ''
+                                    },
                                     title.split(" ").map(num => m("span", num))
                                 ))
                         ),
 
-                        m("div.row-titles", { style: { top: (50) + 'px' } }, // Adjust top offset
-                            rowNumbers.map(title =>
-                                m("div.row-title", { style: { height: cellSize + 'px', width: '50px' } }, // Set height explicitly
-                                    title)
+                        // Row Titles Area (Absolute)
+                        m("div.row-titles", { style: rowTitlesStyle },
+                            rowNumbers.map((title, rowIndex) => // Get row index 'rowIndex'
+                                m("div.row-title", // Base class
+                                    {
+                                        // Set height based on cellSize
+                                        style: { height: `${cellSize}px` },
+                                        // Conditionally add highlight class
+                                        class: rowIndex === state.y ? 'highlighted-title' : ''
+                                    },
+                                    title
+                                )
                             )
                         ),
 
-                        m("table", { style: { marginLeft: '20px' } }, // Add margin to align with row titles
-                            Array.from({ length: height }, (_, rowIndex) => // Rows first (y-axis)
+                        // Table (positions itself in the container's content-box)
+                        m("table",
+                            // ... (rest of the table rendering remains the same)
+                            { style: { margin: 0 } },
+                            Array.from({ length: height }, (_, rowIndex) =>
                                 m("tr",
-                                    Array.from({ length: width }, (_, colIndex) => // Columns second (x-axis)
+                                    Array.from({ length: width }, (_, colIndex) =>
                                         m("td", {
+                                            // Set width and height based on cellSize
                                             style: {
-                                                height: cellSize + 'px', // Use px units
-                                                width: cellSize + 'px',  // Use px units
+                                                height: `${cellSize}px`,
+                                                width: `${cellSize}px`,
                                             },
-                                            class: this.isFocused(rowIndex, colIndex) ? "focused" : "" // Use rowIndex, colIndex here
+                                            // IMPORTANT: Ensure focus class is still applied correctly
+                                            class: this.isFocused(rowIndex, colIndex) ? "focused" : ""
                                         },
-                                            this.getCellContent(rowIndex, colIndex) // Use rowIndex, colIndex here
+                                            this.getCellContent(rowIndex, colIndex)
                                         )
                                     )
                                 )
