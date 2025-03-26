@@ -40,12 +40,14 @@
             position: absolute;
             left: 0;
             top: 69px;
+            /* Adjusted to align better with default cell size + padding/border */
             display: flex;
             flex-direction: column;
         }
 
         .row-title {
             height: 50px;
+            /* Match cell size */
             display: flex;
             align-items: center;
             padding: 0 5px;
@@ -53,6 +55,8 @@
             border-bottom: 1px solid black;
             font-size: 24px;
             font-weight: bold;
+            box-sizing: border-box;
+            /* Include padding/border in height */
         }
 
         .row-title:last-child {
@@ -85,17 +89,23 @@
             height: 100%;
             width: 100%;
             font-size: large;
+            color: #555;
+            /* Lighter cross color */
         }
 
         td.focused::after {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border: 5px solid red;
+            top: -3px;
+            /* Adjusted for better visual alignment */
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 3px solid red;
+            /* Slightly thinner border */
             z-index: 1;
+            pointer-events: none;
+            /* Allow clicks to pass through */
         }
     </style>
 </head>
@@ -104,77 +114,58 @@
     <script src="https://unpkg.com/mithril/mithril.js"></script>
     <script>
         // Temp
-        columnNumbers = ["1", "6", "1", "2"]
-        rowNumbers = ["2", "1", "1", "1", "3", "1 1"]
+        const columnNumbers = ["1", "6", "1", "2"];
+        const rowNumbers = ["2", "1", "1", "1", "3", "1 1"];
 
         // Settings
-        const width = columnNumbers.length
-        const height = rowNumbers.length
-        const cellSize = 50
+        const width = columnNumbers.length;
+        const height = rowNumbers.length;
+        const cellSize = 50;
 
-        // Helper functions
-        const calcIndex = (colIndex, rowIndex) => (colIndex * width) + rowIndex
-
-        state = {
-            x: 0,
-            y: 0,
+        const state = {
+            x: 0, // Represents column index
+            y: 0, // Represents row index
             // 0 = empty, 1 = painted, 2 = crossed
-            game: [
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
+            game: Array.from({ length: height }, () => Array(width).fill(0)), // Initialize game grid correctly
             vim: {
                 repeat: 1,
-                action: 0
+                action: 0 // 0=none, 1=fill(F), 2=cross(D)
             }
         };
 
         const Grid = {
-            // Add event listener when component mounts
-            oncreate: function () {
-                document.addEventListener("keyup", this.boundHandleKeyPress);
-            },
-
-            // Clean up when component unmounts
-            onremove: function () {
-                document.removeEventListener("keyup", this.boundHandleKeyPress);
-            },
+            // No need for oncreate/onremove if using a global listener below
+            // that calls Grid.handleKeyPress directly.
 
             view: function (vnode) {
                 return m("div.container",
                     [
-                        m("div.column-titles",
+                        m("div.column-titles", { style: { left: (50 + 20) + 'px' } }, // Adjust left offset based on row title area
                             columnNumbers.map((title, i) =>
-                                m("div.column-title",
+                                m("div.column-title", { style: { width: cellSize + 'px', height: '50px' } }, // Set width explicitly
                                     title.split(" ").map(num => m("span", num))
                                 ))
                         ),
 
-                        m("div.row-titles",
+                        m("div.row-titles", { style: { top: (50) + 'px' } }, // Adjust top offset
                             rowNumbers.map(title =>
-                                m("div.row-title", title)
+                                m("div.row-title", { style: { height: cellSize + 'px', width: '50px' } }, // Set height explicitly
+                                    title)
                             )
                         ),
 
-                        m("table",
-                            Array.from({ length: height }, (_, colIndex) =>
+                        m("table", { style: { marginLeft: '20px' } }, // Add margin to align with row titles
+                            Array.from({ length: height }, (_, rowIndex) => // Rows first (y-axis)
                                 m("tr",
-                                    Array.from({ length: width }, (_, rowIndex) =>
+                                    Array.from({ length: width }, (_, colIndex) => // Columns second (x-axis)
                                         m("td", {
                                             style: {
-                                                height: cellSize,
-                                                width: cellSize,
-                                                // border: this.getRedBorder(colIndex, rowIndex)
+                                                height: cellSize + 'px', // Use px units
+                                                width: cellSize + 'px',  // Use px units
                                             },
-                                            // class: 'focused'
-                                            class: this.isFocused(colIndex, rowIndex)
+                                            class: this.isFocused(rowIndex, colIndex) ? "focused" : "" // Use rowIndex, colIndex here
                                         },
-                                            // calcIndex(colIndex, rowIndex),
-                                            this.getCellContent(colIndex, rowIndex)
+                                            this.getCellContent(rowIndex, colIndex) // Use rowIndex, colIndex here
                                         )
                                     )
                                 )
@@ -185,133 +176,201 @@
             },
 
             // Component methods
-            getRedBorder: function (colIndex, rowIndex) {
-                return (colIndex === state.y && rowIndex === state.x)
-                    ? "2px solid red"
-                    : "";
+            // getRedBorder: function (rowIndex, colIndex) { // Updated params
+            //     return (rowIndex === state.y && colIndex === state.x)
+            //         ? "2px solid red"
+            //         : "";
+            // },
+
+            isFocused: function (rowIndex, colIndex) { // Updated params
+                return (rowIndex === state.y && colIndex === state.x);
             },
 
-            isFocused: function (colIndex, rowIndex) {
-                return (colIndex === state.y && rowIndex === state.x)
-                    ? "focused"
-                    : "temp";
-            },
-
-            getCellContent: function (colIndex, rowIndex) {
-                const cellState = state.game[colIndex][rowIndex]
-
-                if (cellState == 1) {
-                    return m("div.filled")
-                } else if (cellState == 2) {
-                    return m("div.crossed", "X")
+            getCellContent: function (rowIndex, colIndex) { // Updated params
+                // Ensure rowIndex and colIndex are within bounds before accessing state.game
+                if (rowIndex >= 0 && rowIndex < height && colIndex >= 0 && colIndex < width) {
+                    const cellState = state.game[rowIndex][colIndex];
+                    if (cellState === 1) {
+                        return m("div.filled");
+                    } else if (cellState === 2) {
+                        return m("div.crossed", "X");
+                    }
                 }
-                return null
+                return null; // Return null if out of bounds or empty
             },
 
-            // Move event handler into component
+            // Event handler - NO 'this' context needed if called directly
             handleKeyPress: function (e) {
-                const isDigit = e.code.slice(0, -1) === "Digit"
+                const isDigit = e.code.startsWith("Digit") && e.code !== "Digit0";
 
+                // 1. Handle Digits First
                 if (isDigit) {
-                    console.log("Digit recognized, saving to buffer");
-                    state.vim.repeat = Number(e.code.slice(-1));
-                } else {
-
-                    // Handle single action
-                    if (state.vim.repeat === 1) {
-                        console.log("No repeat buffer, performing single action");
-
-                        if (e.code === "KeyJ") {
-                            state.y = state.y + 1;
-                        } else if (e.code === "KeyK") {
-                            state.y = state.y - 1;
-                        } else if (e.code === "KeyH") {
-                            state.x = state.x - 1;
-                        } else if (e.code === "KeyL") {
-                            state.x = state.x + 1;
-                        } else if (e.code === "KeyF") {
-                            state.game[state.y][state.x] = 1
-                        } else if (e.code === "KeyD") {
-                            state.game[state.y][state.x] = 2
-                        } else if (e.code === "KeyS") {
-                            state.game[state.y][state.x] = 0
-                        }
-                        m.redraw() // .sync?
+                    const digit = Number(e.code.slice(-1));
+                    // If no action is pending and repeat is 1, start a new repeat count.
+                    // Otherwise, append to the existing repeat count.
+                    if (state.vim.action === 0 && state.vim.repeat === 1) {
+                        state.vim.repeat = digit;
+                    } else {
+                        // Append digit (e.g., 1 then 2 becomes 12)
+                        state.vim.repeat = state.vim.repeat * 10 + digit;
                     }
-
-
-                    // Handle cursor move + action buffer
-                    else if (state.vim.repeat > 1 && state.vim.action > 0) {
-                        console.log("Repeat and action recognized, doing them multiple times");
-
-
-                        for (let i = 0; i < state.vim.repeat; i++) {
-                            state.game[state.y][state.x] = state.vim.action
-
-                            if (i < state.vim.repeat - 1) {
-                                if (e.code === "KeyJ") {
-                                    state.y = state.y + 1;
-                                } else if (e.code === "KeyK") {
-                                    state.y = state.y - 1;
-                                } else if (e.code === "KeyH") {
-                                    state.x = state.x - 1;
-                                } else if (e.code === "KeyL") {
-                                    state.x = state.x + 1;
-                                }
-                            }
-
-
-                        }
-                        state.vim.action = 0
-                        state.vim.repeat = 1
-                    }
-
-                    // Handle cursor move
-                    else if (/^Key[HJKL]$/.test(e.code)) {
-
-                        console.log("Repeat recognized, moving cursor multiple times");
-
-
-                        for (let i = 0; i < state.vim.repeat; i++) {
-                            if (e.code === "KeyJ") {
-                                state.y = state.y + 1;
-                            } else if (e.code === "KeyK") {
-                                state.y = state.y - 1;
-                            } else if (e.code === "KeyH") {
-                                state.x = state.x - 1;
-                            } else if (e.code === "KeyL") {
-                                state.x = state.x + 1;
-                            }
-                        }
-
-                        state.vim.repeat = 1
-                        m.redraw()
-                    }
-
-                    // Handle action buffer
-                    else if (state.vim.repeat > 1 && /^Key[DF]$/.test(e.code)) {
-                        console.log("Repeat recognized and action pressed, saving action");
-
-
-                        if (e.code === "KeyF") {
-                            state.vim.action = 1
-                        } else if (e.code === "KeyD") {
-                            state.vim.action = 2
-                        }
-                    }
-
+                    console.log("Digit recognized, repeat set to:", state.vim.repeat);
+                    // Wait for the next key (action or move)
+                    return;
                 }
 
-                console.log(state.vim);
+                // --- Define Key Types ---
+                let dx = 0;
+                let dy = 0;
+                let isMoveKey = false;
+                if (e.code === "KeyJ") { dy = 1; isMoveKey = true; }
+                else if (e.code === "KeyK") { dy = -1; isMoveKey = true; }
+                else if (e.code === "KeyH") { dx = -1; isMoveKey = true; }
+                else if (e.code === "KeyL") { dx = 1; isMoveKey = true; }
+
+                let isFillActionKey = false;
+                let isCrossActionKey = false;
+                let isClearActionKey = false; // Renamed from isClearKey for consistency
+                let pendingActionType = 0; // 0=none, 1=fill, 2=cross, 3=clear (pending)
+
+                if (e.code === "KeyF") { isFillActionKey = true; pendingActionType = 1; }
+                else if (e.code === "KeyD") { isCrossActionKey = true; pendingActionType = 2; }
+                else if (e.code === "KeyS") { isClearActionKey = true; pendingActionType = 3; } // S now sets pending action type 3
+
+                let needsRedraw = false;
+
+                // 2. Handle Action Keys (F, D, S)
+                // Combine F/D/S handling for pending state
+                if (isFillActionKey || isCrossActionKey || isClearActionKey) {
+                    const immediateActionValue = pendingActionType === 3 ? 0 : pendingActionType; // S(3) maps to state 0
+
+                    // If repeat is 1 (meaning no number preceded action key),
+                    // apply the action immediately and reset vim state.
+                    if (state.vim.repeat === 1) {
+                        console.log(`Immediate action: ${pendingActionType} (Applying state ${immediateActionValue})`);
+                        if (state.y >= 0 && state.y < height && state.x >= 0 && state.x < width) {
+                            if (state.game[state.y][state.x] !== immediateActionValue) {
+                                state.game[state.y][state.x] = immediateActionValue;
+                                needsRedraw = true;
+                            }
+                        }
+                        // Reset state completely after immediate action
+                        state.vim.action = 0;
+                        state.vim.repeat = 1;
+                    } else {
+                        // If repeat > 1 (e.g., '3f', '3s'), store the action type and wait for a move key.
+                        state.vim.action = pendingActionType; // Store 1, 2, or 3
+                        console.log(`Action ${state.vim.action} pending, repeat ${state.vim.repeat}, waiting for direction...`);
+                        // Don't reset repeat here, it's needed for the move key.
+                    }
+                }
+                // 3. Handle Movement Keys (H, J, K, L)
+                else if (isMoveKey) {
+                    // Check if an action is pending (from a preceding F/D/S key with repeat > 1)
+                    if (state.vim.action > 0) {
+                        // Determine the actual game state value to apply based on the pending action
+                        const actualActionToApply = state.vim.action === 3 ? 0 : state.vim.action; // Map pending clear(3) to state 0
+
+                        // Execute <action><num><direction> sequence
+                        console.log(`Executing pending action ${state.vim.action} (Apply: ${actualActionToApply}), repeat ${state.vim.repeat}, direction ${dx},${dy}`);
+                        for (let i = 0; i < state.vim.repeat; i++) {
+                            // Apply action at current position
+                            if (state.y >= 0 && state.y < height && state.x >= 0 && state.x < width) {
+                                if (state.game[state.y][state.x] !== actualActionToApply) {
+                                    state.game[state.y][state.x] = actualActionToApply;
+                                    needsRedraw = true;
+                                }
+                            } else {
+                                console.warn("Attempted action outside bounds - stopping repeat.");
+                                break; // Stop if current pos is somehow out of bounds
+                            }
+
+                            // Move for the next iteration (if not the last one)
+                            if (i < state.vim.repeat - 1) {
+                                const nextX = state.x + dx;
+                                const nextY = state.y + dy;
+                                let movedThisIteration = false;
+                                // Check bounds *before* updating state.x/state.y
+                                if (dx !== 0 && nextX >= 0 && nextX < width) {
+                                    state.x = nextX;
+                                    movedThisIteration = true;
+                                }
+                                // Check Y boundary independently, applying if valid
+                                if (dy !== 0 && nextY >= 0 && nextY < height) {
+                                    state.y = nextY;
+                                    movedThisIteration = true; // It counts as moved even if only one direction was valid
+                                }
+
+                                // If we intended to move (dx or dy was non-zero) but didn't actually change position
+                                // (because both nextX and nextY were out of bounds), stop the loop.
+                                if (!movedThisIteration && (dx !== 0 || dy !== 0)) {
+                                    console.log("Hit boundary during action+move repeat - stopping.");
+                                    needsRedraw = true; // Need redraw to show final focus position
+                                    break;
+                                }
+                                needsRedraw = true; // Always need redraw if we moved
+                            }
+                        }
+                        // Reset vim state after completion
+                        state.vim.action = 0;
+                        state.vim.repeat = 1;
+
+                    } else {
+                        // Execute simple <num><direction> move (no pending action)
+                        console.log(`Executing move with repeat ${state.vim.repeat} and direction ${dx},${dy}`);
+                        for (let i = 0; i < state.vim.repeat; i++) {
+                            const nextX = state.x + dx;
+                            const nextY = state.y + dy;
+                            let movedThisIteration = false;
+                            // Check bounds *before* updating
+                            if (dx !== 0 && nextX >= 0 && nextX < width) {
+                                state.x = nextX;
+                                movedThisIteration = true;
+                            }
+                            if (dy !== 0 && nextY >= 0 && nextY < height) {
+                                state.y = nextY;
+                                movedThisIteration = true;
+                            }
+                            // If trying to move but couldn't (hit boundary), stop the loop.
+                            if (!movedThisIteration && (dx !== 0 || dy !== 0)) {
+                                console.log("Hit boundary during move repeat - stopping.");
+                                needsRedraw = true; // Need redraw to show final focus position
+                                break;
+                            }
+                            needsRedraw = true; // Always need redraw if we moved
+                        }
+                        // Reset only repeat count after simple move
+                        state.vim.repeat = 1;
+                    }
+                }
+                // 4. Handle Other Keys (Not digit, action, or move)
+                else {
+                    // Any other key resets the pending action and repeat count
+                    if (!isDigit) { // Digits already handled
+                        if (state.vim.repeat !== 1 || state.vim.action !== 0) {
+                            console.log("Non-vim sequence key pressed, resetting vim state.");
+                            state.vim.action = 0;
+                            state.vim.repeat = 1;
+                        }
+                    }
+                }
+
+                // Redraw if necessary
+                if (needsRedraw) {
+                    m.redraw();
+                }
+
+                console.log("End state -> x:", state.x, "y:", state.y, "Repeat:", state.vim.repeat, "Action:", state.vim.action);
             }
         }
 
-        // Add event listener with proper context binding
+        // Global event listener
         document.addEventListener("keyup", (e) => {
             Grid.handleKeyPress(e);
-            m.redraw.sync(); // Sync with Mithril's redraw cycle
+            // m.redraw() is now called inside handleKeyPress if needed
         });
 
-        m.mount(document.body, Grid)
+        m.mount(document.body, Grid);
+
     </script>
 </body>
