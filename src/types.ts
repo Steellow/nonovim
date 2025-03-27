@@ -23,6 +23,7 @@ interface GameState {
     x: number; // Current focus col index
     y: number; // Current focus row index
     constants: GameConstants;
+    keyboardHandler: (event: KeyboardEvent) => void;
 }
 
 interface GameConstants {
@@ -35,4 +36,4 @@ interface GameConstants {
     tableTotalWidth: number;
 }
 
-type cellCssClass = "blank" | "clue" | "focused" | ""
+type CellCssClass = "blank" | "clue" | "focused" | ""

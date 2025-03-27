@@ -1,4 +1,4 @@
-export function getCellCssClass(isBlank: boolean, isFocused: boolean, clueValue: number | null): cellCssClass {
+export function getCellCssClass(isBlank: boolean, isFocused: boolean, clueValue: number | null): CellCssClass {
     if (isBlank) {
         return "blank"
     }

@@ -1,6 +1,7 @@
 import m from 'mithril'; // Import Mithril
 import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedCell, loop } from './table_utils';
 import { getCellCssClass } from './styling_utils';
+import { handleKeyPress } from './keyboard_handler';
 
 
 const Game: m.Component<{}, GameState> = {
@@ -27,7 +28,24 @@ const Game: m.Component<{}, GameState> = {
             tableTotalWidth: clues.cols.length + rowClueAreaWidth
         }
 
+        const handleKeypressWrapper = (e: KeyboardEvent) => {
+            if (handleKeyPress(e, vnode.state)) {
+                m.redraw()
+            }
+        }
+        vnode.state.keyboardHandler = handleKeypressWrapper
+
         console.log("Game component initialized. State:", vnode.state);
+    },
+
+    oncreate: function (vnode) {
+        document.addEventListener('keydown', vnode.state.keyboardHandler)
+        console.log("Keyboard handler added");
+    },
+
+    onremove: function (vnode) {
+        document.removeEventListener('keydown', vnode.state.keyboardHandler)
+        console.log("Keyboard listener removed");
     },
 
     view: function (vnode) {
@@ -57,14 +75,17 @@ const Game: m.Component<{}, GameState> = {
             }))
         })
         )
+    },
 
-    }
+
 };
 
-// Find the root element in index.html
-const root = document.getElementById('app');
+document.addEventListener("keyup", e => {
+    e.preventDefault()
 
-// Mount the TableComponent onto the root element, passing attributes
+})
+
+const root = document.getElementById('app');
 if (root) {
     m.mount(root, {
         view: () => m(Game)
