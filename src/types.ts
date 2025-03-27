@@ -22,8 +22,13 @@ interface GameState {
     gameBoard: GameBoard;
     x: number; // Current focus col index
     y: number; // Current focus row index
+    keyboardBuffer: KeyboardBuffer;
     constants: GameConstants;
     keyboardHandler: (event: KeyboardEvent) => void;
+}
+
+interface KeyboardBuffer {
+    repeat: number
 }
 
 interface GameConstants {

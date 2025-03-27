@@ -27,6 +27,9 @@ const Game: m.Component<{}, GameState> = {
             tableTotalHeight: clues.rows.length + colClueAreaHeight,
             tableTotalWidth: clues.cols.length + rowClueAreaWidth
         }
+        vnode.state.keyboardBuffer = {
+            repeat: 1
+        }
 
         const handleKeypressWrapper = (e: KeyboardEvent) => {
             if (handleKeyPress(e, vnode.state)) {
