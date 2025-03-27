@@ -20,8 +20,18 @@ type GameBoard = CellState[][];
 
 interface GameState {
     clues: NonogramClues;
-    game: GameBoard;
+    gameBoard: GameBoard;
     x: number; // Current focus col index
     y: number; // Current focus row index
-    cellSize: number; // Setting, maybe move elsewhere?
+    constants: GameConstants;
+}
+
+interface GameConstants {
+    cellSize: number;
+    rowClueAreaWidth: number;
+    colClueAreaHeight: number;
+
+    // Table total size containing board, clues and empty area
+    tableTotalHeight: number;
+    tableTotalWidth: number;
 }

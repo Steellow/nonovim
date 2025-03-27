@@ -14,20 +14,6 @@ export const getMaxClueLength = (clues: ClueSet[]): number => clues.reduce(
         currentArray.length > longestSoFar.length ? currentArray : longestSoFar,
     clues[0]).length
 
-export function getTableTotalWidth(clues: NonogramClues): number {
-    const gameWidth: number = clues.cols.length
-    const maxRowClues: number = getMaxClueLength(clues.rows)
-
-    return gameWidth + maxRowClues
-}
-
-export function getTableTotalHeight(clues: NonogramClues): number {
-    const gameHeight: number = clues.rows.length
-    const maxColClues: number = getMaxClueLength(clues.cols)
-
-    return gameHeight + maxColClues
-}
-
 export function loop(num: number): number[] {
     return Array.from({ length: num }, (_, i) => i)
 }
