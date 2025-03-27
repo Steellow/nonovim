@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES6", // Target modern browsers
+        "module": "ESNext", // Use modern module system
+        "moduleResolution": "node", // How modules are found
+        "outDir": "public/dist", // Where to output compiled JS
+        "rootDir": "src", // Root directory of source files
+        "strict": true, // Enable strict type-checking
+        "esModuleInterop": true, // Allows default imports from commonjs modules
+        "skipLibCheck": true, // Skip type checking of declaration files
+        "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references
+        "lib": [
+            "DOM",
+            "ESNext"
+        ], // Include standard browser and ESNext libraries
+        "sourceMap": true // Generate source maps for debugging
+    },
+    "include": [
+        "src/**/*"
+    ], // Which files to compile
+    "exclude": [
+        "node_modules"
+    ] // Which files/directories to ignore
+}

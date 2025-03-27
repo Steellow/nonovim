@@ -1,0 +1,26 @@
+body {
+    font-family: sans-serif;
+}
+
+td,
+th,
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+    min-width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+td.blank {
+    border: none;
+}
+
+td.clue {
+    font-weight: bold;
+}
+
+td.focused {
+    background-color: red;
+}

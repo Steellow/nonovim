@@ -1,0 +1,21 @@
+{
+  "name": "nonovim",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=public/dist/bundle.js --platform=browser --sourcemap",
+    "start": "npm run build && npx serve public",
+    "dev": "esbuild src/index.ts --bundle --outfile=public/dist/bundle.js --platform=browser --sourcemap --watch"
+  },
+  "author": "hanki.dev",
+  "license": "ISC",
+  "description": "Nonogram app with vim-like keybindings",
+  "dependencies": {
+    "mithril": "^2.2.15"
+  },
+  "devDependencies": {
+    "@types/mithril": "^2.2.7",
+    "esbuild": "^0.25.1",
+    "typescript": "^5.8.2"
+  }
+}
