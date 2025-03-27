@@ -30,6 +30,7 @@ const Game: m.Component<{}, GameState> = {
 
         const handleKeypressWrapper = (e: KeyboardEvent) => {
             if (handleKeyPress(e, vnode.state)) {
+                console.debug("Redrawing UI");
                 m.redraw()
             }
         }

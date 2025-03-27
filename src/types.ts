@@ -37,3 +37,5 @@ interface GameConstants {
 }
 
 type CellCssClass = "blank" | "clue" | "focused" | ""
+
+type MoveDirection = "left" | "right" | "up" | "down"
