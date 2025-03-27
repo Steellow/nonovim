@@ -21,9 +21,9 @@ export function loop(num: number): number[] {
 /**
  * Determines if a cell at given table coordinates is part of the top-left blank area.
  */
-export function isBlankCell(colIndex: number, rowIndex: number, clues: NonogramClues): boolean {
-    const blankByRow = rowIndex < getMaxClueLength(clues.rows)
-    const blankByCol = colIndex < getMaxClueLength(clues.cols)
+export function isBlankCell(colIndex: number, rowIndex: number, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
+    const blankByRow = rowIndex < rowClueAreaWidth
+    const blankByCol = colIndex < colClueAreaHeight
 
     return blankByRow && blankByCol
 }
@@ -31,33 +31,30 @@ export function isBlankCell(colIndex: number, rowIndex: number, clues: NonogramC
 /**
  * Gets the specific clue number to display at given table coordinates.
  * Returns null if the cell is blank, part of the game grid, or an empty clue slot.
- * @param tableRowIndex The row index in the overall table grid.
- * @param tableColIndex The column index in the overall table grid.
+ * @param rowIndex The row index in the overall table grid.
+ * @param colIndex The column index in the overall table grid.
  * @param clues The nonogram clues data.
  * @returns The clue number or null.
  */
-export function getClue(tableRowIndex: number, tableColIndex: number, clues: NonogramClues): number | null {
-    const maxRowClues = getMaxClueLength(clues.rows);  // Width of the row clue area
-    const maxColClues = getMaxClueLength(clues.cols);  // Height of the col clue area
-
+export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): number | null {
     // 1. Check if it's in the top-left blank area
-    if (tableRowIndex < maxColClues && tableColIndex < maxRowClues) {
+    if (rowIndex < colClueAreaHeight && colIndex < rowClueAreaWidth) {
         return null;
     }
 
     // 2. Check if it's in the main game grid area
-    if (tableRowIndex >= maxColClues && tableColIndex >= maxRowClues) {
+    if (rowIndex >= colClueAreaHeight && colIndex >= rowClueAreaWidth) {
         return null;
     }
 
     // 3. Check if it's in the top (column clues) area
-    if (tableRowIndex < maxColClues && tableColIndex >= maxRowClues) {
-        const actualGameColIndex = tableColIndex - maxRowClues;
+    if (rowIndex < colClueAreaHeight && colIndex >= rowClueAreaWidth) {
+        const actualGameColIndex = colIndex - rowClueAreaWidth;
         const targetColClues = clues.cols[actualGameColIndex];
 
         // Calculate index within the specific column clue array
         // Clues are aligned to the bottom edge (closer to the game grid)
-        const clueIndexInSet = targetColClues.length - (maxColClues - tableRowIndex);
+        const clueIndexInSet = targetColClues.length - (colClueAreaHeight - rowIndex);
 
         if (clueIndexInSet >= 0 && clueIndexInSet < targetColClues.length) {
             return targetColClues[clueIndexInSet];
@@ -67,13 +64,13 @@ export function getClue(tableRowIndex: number, tableColIndex: number, clues: Non
     }
 
     // 4. Check if it's in the left (row clues) area
-    if (tableRowIndex >= maxColClues && tableColIndex < maxRowClues) {
-        const actualGameRowIndex = tableRowIndex - maxColClues;
+    if (rowIndex >= colClueAreaHeight && colIndex < rowClueAreaWidth) {
+        const actualGameRowIndex = rowIndex - colClueAreaHeight;
         const targetRowClues = clues.rows[actualGameRowIndex];
 
         // Calculate index within the specific row clue array
         // Clues are aligned to the right edge (closer to the game grid)
-        const clueIndexInSet = targetRowClues.length - (maxRowClues - tableColIndex);
+        const clueIndexInSet = targetRowClues.length - (rowClueAreaWidth - colIndex);
 
         if (clueIndexInSet >= 0 && clueIndexInSet < targetRowClues.length) {
             return targetRowClues[clueIndexInSet];
@@ -85,10 +82,7 @@ export function getClue(tableRowIndex: number, tableColIndex: number, clues: Non
     return null;
 }
 
-export function isFocusedCell(cellRowIndex: number, cellColIndex: number, focusX: number, focusY: number, clues: NonogramClues): boolean {
-    const rowClueAreaWidth = getMaxClueLength(clues.rows);
-    const colClueAreaHeight = getMaxClueLength(clues.cols);
-
+export function isFocusedCell(cellRowIndex: number, cellColIndex: number, focusX: number, focusY: number, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
     const focusOnWholeTableX = rowClueAreaWidth + focusX
     const focusOnWholeTableY = colClueAreaHeight + focusY
 

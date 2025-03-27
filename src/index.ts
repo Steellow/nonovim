@@ -31,12 +31,13 @@ const Game: m.Component<{}, GameState> = {
 
     view: function (vnode) {
         const { clues, gameBoard, x, y, constants } = vnode.state;
+        const { cellSize, rowClueAreaWidth, colClueAreaHeight, tableTotalHeight, tableTotalWidth } = constants
 
         return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
             return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
-                const isBlank = isBlankCell(rowIndex, colIndex, clues);
-                const clueValue = getClue(rowIndex, colIndex, clues);
-                const isFocused = isFocusedCell(rowIndex, colIndex, x, y, clues)
+                const isBlank = isBlankCell(rowIndex, colIndex, rowClueAreaWidth, colClueAreaHeight);
+                const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
+                const isFocused = isFocusedCell(rowIndex, colIndex, x, y, clues, rowClueAreaWidth, colClueAreaHeight)
 
                 let cellTypeClass = '';
 
