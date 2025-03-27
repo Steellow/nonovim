@@ -1,5 +1,6 @@
 import m from 'mithril'; // Import Mithril
-import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedCell, loop } from './board_utils';
+import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedCell, loop } from './table_utils';
+import { getCellCssClass } from './styling_utils';
 
 
 const Game: m.Component<{}, GameState> = {
@@ -36,18 +37,11 @@ const Game: m.Component<{}, GameState> = {
         return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
             return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
                 const isBlank = isBlankCell(rowIndex, colIndex, rowClueAreaWidth, colClueAreaHeight);
-                const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
                 const isFocused = isFocusedCell(rowIndex, colIndex, x, y, clues, rowClueAreaWidth, colClueAreaHeight)
 
-                let cellTypeClass = '';
+                const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
 
-                if (isBlank) {
-                    cellTypeClass = 'blank';
-                } else if (clueValue !== null) {
-                    cellTypeClass = 'clue';
-                } else if (isFocused) {
-                    cellTypeClass = 'focused'
-                }
+                let cellTypeClass = getCellCssClass(isBlank, isFocused, clueValue)
 
                 return m("td.cell", {
                     key: `cell-${rowIndex}-${colIndex}`,

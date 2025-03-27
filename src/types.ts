@@ -17,7 +17,6 @@ type CellState = 0 | 1 | 2;
 // Represents the game board grid
 type GameBoard = CellState[][];
 
-
 interface GameState {
     clues: NonogramClues;
     gameBoard: GameBoard;
@@ -35,3 +34,5 @@ interface GameConstants {
     tableTotalHeight: number;
     tableTotalWidth: number;
 }
+
+type cellCssClass = "blank" | "clue" | "focused" | ""
