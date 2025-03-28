@@ -2,21 +2,35 @@
 export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants): boolean {
     e.preventDefault()
 
+    // <num> already pressed, then <action>
+    if (keyboardBuffer.repeat > 1 && actionKeyPressed(e.code)) {
+        storeAction(e.code as ActionKeyCodes, keyboardBuffer)
+        console.debug(keyboardBuffer);
+        return false
+    }
+
+    // <num><action> pressed, then <direction>
+    if (keyboardBuffer.repeat > 1 && keyboardBuffer.pendingAction !== null) {
+
+    }
+
     switch (e.code) {
 
-        // Basic movement
+        // Basic movement (HJKL)
         case "KeyH":
-            return moveLeft(position, keyboardBuffer, constants)
+            return move(position, keyboardBuffer, constants, gameBoard, "left")
 
         case "KeyJ":
-            return moveDown(position, keyboardBuffer, constants)
+            return move(position, keyboardBuffer, constants, gameBoard, "down")
 
         case "KeyK":
-            return moveUp(position, keyboardBuffer, constants)
+            return move(position, keyboardBuffer, constants, gameBoard, "up")
 
         case "KeyL":
-            return moveRight(position, keyboardBuffer, constants)
+            return move(position, keyboardBuffer, constants, gameBoard, "right")
 
+
+        // Basic cell action (fill, cross, clear)
         case "KeyF":
             return changeCellState(gameBoard, position, 1)
 
@@ -39,16 +53,37 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
 
 const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, state: CellState): boolean => {
     gameBoard[position.y][position.x] = state
-
     return true
 }
 
-const moveDown = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
+const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants, gameBoard: GameBoard, direction: MoveDirection) => {
     let renderUi = false
+
+    const boundaryCheck = getMovementBoundaryCheck(direction, position, constants)
+
+    // Save pending action and remove it from state
+    const pendingAction = keyboardBuffer.pendingAction
+    keyboardBuffer.pendingAction = null
+
+    // When painting multiple cells at a time,
+    // also paint the starting position
+    if (pendingAction !== null) {
+        changeCellState(gameBoard, position, pendingAction)
+    }
+
+    // Repeat movement x times
     for (let i = 0; i < keyboardBuffer.repeat; i++) {
-        if (position.y + constants.colClueAreaHeight < constants.tableTotalHeight - 1) {
-            position.y += 1
+        if (boundaryCheck()) {
+            simpleMove(direction, position)
+
+            // If pending action in keyboard buffer
+            if (pendingAction !== null) {
+                changeCellState(gameBoard, position, pendingAction)
+            }
+
             renderUi = true
+        } else {
+            break
         }
     }
 
@@ -56,41 +91,60 @@ const moveDown = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, cons
     return renderUi
 }
 
-const moveUp = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
-    let renderUi = false
-    for (let i = 0; i < keyboardBuffer.repeat; i++) {
-        if (position.y + constants.colClueAreaHeight > constants.colClueAreaHeight) {
-            position.y -= 1
-            renderUi = true
-        }
-    }
+const getMovementBoundaryCheck = (direction: MoveDirection, position: PlayerPosition, constants: GameConstants): () => boolean => {
+    switch (direction) {
+        case "left":
+            return () => position.x + constants.rowClueAreaWidth > constants.rowClueAreaWidth
 
-    keyboardBuffer.repeat = 1
-    return renderUi
+        case "right":
+            return () => position.x + constants.rowClueAreaWidth < constants.tableTotalWidth - 1
+
+        case "up":
+            return () => position.y + constants.colClueAreaHeight > constants.colClueAreaHeight
+
+        case "down":
+            return () => position.y + constants.colClueAreaHeight < constants.tableTotalHeight - 1
+    }
 }
 
-const moveLeft = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
-    let renderUi = false
-    for (let i = 0; i < keyboardBuffer.repeat; i++) {
-        if (position.x + constants.rowClueAreaWidth > constants.rowClueAreaWidth) {
-            position.x -= 1
-            renderUi = true
-        }
-    }
+const simpleMove = (direction: MoveDirection, position: PlayerPosition) => {
+    switch (direction) {
+        case "left":
+            position.x--
+            break;
 
-    keyboardBuffer.repeat = 1
-    return renderUi
+        case "right":
+            position.x++
+            break
+
+        case "up":
+            position.y--
+            break
+
+        case "down":
+            position.y++
+            break
+    }
 }
 
-const moveRight = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
-    let renderUi = false
-    for (let i = 0; i < keyboardBuffer.repeat; i++) {
-        if (position.x + constants.rowClueAreaWidth < constants.tableTotalWidth - 1) {
-            position.x += 1
-            renderUi = true
-        }
-    }
+const actionKeyPressed = (keyCode: string) => ["KeyS", "KeyD", "KeyF"].includes(keyCode)
 
-    keyboardBuffer.repeat = 1
-    return renderUi
-}
+const storeAction = (keyCode: ActionKeyCodes, keyboardBuffer: KeyboardBuffer) => {
+    switch (keyCode) {
+        case "KeyS":
+            keyboardBuffer.pendingAction = 0
+            break;
+
+        case "KeyD":
+            keyboardBuffer.pendingAction = 2
+            break;
+
+        case "KeyF":
+            keyboardBuffer.pendingAction = 1
+            break;
+
+        default:
+            console.error("Cannot store action " + keyCode);
+            break;
+    }
+} 

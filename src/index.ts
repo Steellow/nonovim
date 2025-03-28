@@ -35,7 +35,8 @@ const Game = () => {
     const gameBoard: GameBoard = initializeEmptyBoard(clues)
 
     const keyboardBuffer: KeyboardBuffer = {
-        repeat: 1
+        repeat: 1,
+        pendingAction: null
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {

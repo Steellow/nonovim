@@ -23,7 +23,8 @@ interface PlayerPosition {
 }
 
 interface KeyboardBuffer {
-    repeat: number
+    repeat: number;
+    pendingAction: CellState | null
 }
 
 interface GameConstants {
@@ -37,3 +38,7 @@ interface GameConstants {
 }
 
 type CellValue = number | "X" | null
+
+type ActionKeyCodes = "KeyS" | "KeyD" | "KeyF"
+
+type MoveDirection = "left" | "right" | "up" | "down"

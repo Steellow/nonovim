@@ -29,10 +29,7 @@ td.player-position {
 td.player-position::after {
     content: '';
     position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
+    inset: -4px;
     border: 4px solid red;
     z-index: 1;
     pointer-events: none;
