@@ -6,16 +6,16 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
 
         // Basic movement
         case "KeyH":
-            return moveLeft(position, keyboardBuffer.repeat, constants)
+            return moveLeft(position, keyboardBuffer, constants)
 
         case "KeyJ":
-            return moveDown(position, keyboardBuffer.repeat, constants)
+            return moveDown(position, keyboardBuffer, constants)
 
         case "KeyK":
-            return moveUp(position, keyboardBuffer.repeat, constants)
+            return moveUp(position, keyboardBuffer, constants)
 
         case "KeyL":
-            return moveRight(position, keyboardBuffer.repeat, constants)
+            return moveRight(position, keyboardBuffer, constants)
 
         case "KeyF":
             return changeCellState(gameBoard, position, 1)
@@ -43,54 +43,54 @@ const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, state: 
     return true
 }
 
-const moveDown = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
+const moveDown = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < repeat; i++) {
+    for (let i = 0; i < keyboardBuffer.repeat; i++) {
         if (position.y + constants.colClueAreaHeight < constants.tableTotalHeight - 1) {
             position.y += 1
             renderUi = true
         }
     }
 
-    repeat = 1
+    keyboardBuffer.repeat = 1
     return renderUi
 }
 
-const moveUp = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
+const moveUp = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < repeat; i++) {
+    for (let i = 0; i < keyboardBuffer.repeat; i++) {
         if (position.y + constants.colClueAreaHeight > constants.colClueAreaHeight) {
             position.y -= 1
             renderUi = true
         }
     }
 
-    repeat = 1
+    keyboardBuffer.repeat = 1
     return renderUi
 }
 
-const moveLeft = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
+const moveLeft = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < repeat; i++) {
+    for (let i = 0; i < keyboardBuffer.repeat; i++) {
         if (position.x + constants.rowClueAreaWidth > constants.rowClueAreaWidth) {
             position.x -= 1
             renderUi = true
         }
     }
 
-    repeat = 1
+    keyboardBuffer.repeat = 1
     return renderUi
 }
 
-const moveRight = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
+const moveRight = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < repeat; i++) {
+    for (let i = 0; i < keyboardBuffer.repeat; i++) {
         if (position.x + constants.rowClueAreaWidth < constants.tableTotalWidth - 1) {
             position.x += 1
             renderUi = true
         }
     }
 
-    repeat = 1
+    keyboardBuffer.repeat = 1
     return renderUi
 }
