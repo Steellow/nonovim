@@ -17,14 +17,9 @@ type CellState = 0 | 1 | 2;
 // Represents the game board grid
 type GameBoard = CellState[][];
 
-interface GameState {
-    clues: NonogramClues;
-    gameBoard: GameBoard;
-    x: number; // Current focus col index
-    y: number; // Current focus row index
-    keyboardBuffer: KeyboardBuffer;
-    constants: GameConstants;
-    keyboardHandler: (event: KeyboardEvent) => void;
+interface PlayerPosition {
+    x: number;
+    y: number;
 }
 
 interface KeyboardBuffer {

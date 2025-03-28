@@ -1,26 +1,26 @@
 // Returns true if UI should be redrawn
-export function handleKeyPress(e: KeyboardEvent, state: GameState): boolean {
+export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants): boolean {
     e.preventDefault()
 
     switch (e.code) {
 
         // Basic movement
         case "KeyH":
-            return moveLeft(state)
+            return moveLeft(position, keyboardBuffer.repeat, constants)
 
         case "KeyJ":
-            return moveDown(state)
+            return moveDown(position, keyboardBuffer.repeat, constants)
 
         case "KeyK":
-            return moveUp(state)
+            return moveUp(position, keyboardBuffer.repeat, constants)
 
         case "KeyL":
-            return moveRight(state)
+            return moveRight(position, keyboardBuffer.repeat, constants)
 
         default:
             // Store repeat action
             if (e.code.startsWith("Digit") && e.code !== "Digit0") {
-                state.keyboardBuffer.repeat = Number(e.code.slice(-1))
+                keyboardBuffer.repeat = Number(e.code.slice(-1))
                 return false
             }
     }
@@ -28,54 +28,54 @@ export function handleKeyPress(e: KeyboardEvent, state: GameState): boolean {
     return false
 }
 
-const moveDown = (state: GameState) => {
+const moveDown = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < state.keyboardBuffer.repeat; i++) {
-        if (state.y + state.constants.colClueAreaHeight < state.constants.tableTotalHeight - 1) {
-            state.y += 1
+    for (let i = 0; i < repeat; i++) {
+        if (position.y + constants.colClueAreaHeight < constants.tableTotalHeight - 1) {
+            position.y += 1
             renderUi = true
         }
     }
 
-    state.keyboardBuffer.repeat = 1
+    repeat = 1
     return renderUi
 }
 
-const moveUp = (state: GameState) => {
+const moveUp = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < state.keyboardBuffer.repeat; i++) {
-        if (state.y + state.constants.colClueAreaHeight > state.constants.colClueAreaHeight) {
-            state.y -= 1
+    for (let i = 0; i < repeat; i++) {
+        if (position.y + constants.colClueAreaHeight > constants.colClueAreaHeight) {
+            position.y -= 1
             renderUi = true
         }
     }
 
-    state.keyboardBuffer.repeat = 1
+    repeat = 1
     return renderUi
 }
 
-const moveLeft = (state: GameState) => {
+const moveLeft = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < state.keyboardBuffer.repeat; i++) {
-        if (state.x + state.constants.rowClueAreaWidth > state.constants.rowClueAreaWidth) {
-            state.x -= 1
+    for (let i = 0; i < repeat; i++) {
+        if (position.x + constants.rowClueAreaWidth > constants.rowClueAreaWidth) {
+            position.x -= 1
             renderUi = true
         }
     }
 
-    state.keyboardBuffer.repeat = 1
+    repeat = 1
     return renderUi
 }
 
-const moveRight = (state: GameState) => {
+const moveRight = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
     let renderUi = false
-    for (let i = 0; i < state.keyboardBuffer.repeat; i++) {
-        if (state.x + state.constants.rowClueAreaWidth < state.constants.tableTotalWidth - 1) {
-            state.x += 1
+    for (let i = 0; i < repeat; i++) {
+        if (position.x + constants.rowClueAreaWidth < constants.tableTotalWidth - 1) {
+            position.x += 1
             renderUi = true
         }
     }
 
-    state.keyboardBuffer.repeat = 1
+    repeat = 1
     return renderUi
 }

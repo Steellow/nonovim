@@ -82,9 +82,9 @@ export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues
     return null;
 }
 
-export function isFocusedCell(cellRowIndex: number, cellColIndex: number, focusX: number, focusY: number, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
-    const focusOnWholeTableX = rowClueAreaWidth + focusX
-    const focusOnWholeTableY = colClueAreaHeight + focusY
+export function isFocusedCell(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
+    const focusOnWholeTableX = rowClueAreaWidth + playerPosition.x
+    const focusOnWholeTableY = colClueAreaHeight + playerPosition.y
 
     const isFocused = cellColIndex === focusOnWholeTableX && cellRowIndex === focusOnWholeTableY
     if (isFocused) {
