@@ -42,3 +42,8 @@ td.player-position::after {
 td.focused {
     background-color: rgb(240, 240, 240);
 }
+
+td.filled {
+    background-color: rgb(13, 13, 13);
+    box-shadow: inset 0 0 0 1px white;
+}

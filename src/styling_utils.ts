@@ -1,20 +1,40 @@
-export function getCellCssClass(isBlank: boolean, isPlayerPosition: boolean,
-    isFocusedRowOrColumn: boolean, clueValue: number | null): CellCssClass {
+import { isFilledCell, isGameBoardArea } from "./table_utils"
+
+export function getCellCssClass(
+    isBlank: boolean,
+    isPlayerPosition: boolean,
+    isFocusedRowOrColumn: boolean,
+    clueValue: number | null,
+    gameBoard: GameBoard,
+    position: PlayerPosition,
+    rowIndex: number,
+    colIndex: number,
+    constants: GameConstants,
+): string {
+
+    const classes = []
+
+    // TODO: Call table_utils.ts here!
     if (isBlank) {
         return "blank"
     }
 
     if (isPlayerPosition) {
-        return "player-position"
+        classes.push("player-position")
     }
 
     if (isFocusedRowOrColumn) {
-        return "focused"
+        classes.push("focused")
     }
 
     if (clueValue !== null) {
-        return "clue"
+        classes.push("clue")
     }
 
-    return ""
+    if (isFilledCell(rowIndex, colIndex, gameBoard, constants)) {
+        classes.push("filled")
+    }
+
+
+    return classes.join(" ")
 }

@@ -100,3 +100,18 @@ export function isFocusedRowOrCol(cellRowIndex: number, cellColIndex: number, pl
 
     return cellColIndex === focusOnWholeTableX || cellRowIndex === focusOnWholeTableY
 }
+
+export function isGameBoardArea(rowIndex: number, colIndex: number, constants: GameConstants) {
+    return rowIndex >= constants.colClueAreaHeight && colIndex >= constants.rowClueAreaWidth
+}
+
+export function isFilledCell(rowIndex: number, colIndex: number, gameBoard: GameBoard, constants: GameConstants) {
+    if (!isGameBoardArea(rowIndex, colIndex, constants)) {
+        return false
+    }
+
+    const gameBoardX = rowIndex - constants.colClueAreaHeight
+    const gameBoardY = colIndex - constants.rowClueAreaWidth
+
+    return gameBoard[gameBoardX][gameBoardY]
+}

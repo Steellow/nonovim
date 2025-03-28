@@ -23,6 +23,9 @@ const Game = () => {
         tableTotalHeight: clues.rows.length + colClueAreaHeight,
     }
 
+    console.debug("constants: " + constants);
+
+
     const playerPosition: PlayerPosition = {
         x: 0,
         y: 0
@@ -36,7 +39,7 @@ const Game = () => {
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {
-        if (handleKeyPress(e, playerPosition, keyboardBuffer, constants)) {
+        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, constants)) {
             console.debug("Redrawing UI");
             m.redraw()
         }
@@ -61,11 +64,11 @@ const Game = () => {
 
                     const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
 
-                    let cellTypeClass = getCellCssClass(isBlank, isPlayerPosition(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), isFocusedRowOrCol(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), clueValue)
+                    let classes = getCellCssClass(isBlank, isPlayerPosition(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), isFocusedRowOrCol(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), clueValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
 
                     return m("td.cell", {
                         key: `cell-${rowIndex}-${colIndex}`,
-                        class: cellTypeClass,
+                        class: classes,
                         style: {
                             height: `${constants.cellSize}px`,
                             width: `${constants.cellSize}px`,

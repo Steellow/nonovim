@@ -1,5 +1,5 @@
 // Returns true if UI should be redrawn
-export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants): boolean {
+export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants): boolean {
     e.preventDefault()
 
     switch (e.code) {
@@ -17,6 +17,10 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, keybo
         case "KeyL":
             return moveRight(position, keyboardBuffer.repeat, constants)
 
+        // Paint
+        case "KeyF":
+            return fillCell(gameBoard, position)
+
         default:
             // Store repeat action
             if (e.code.startsWith("Digit") && e.code !== "Digit0") {
@@ -26,6 +30,13 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, keybo
     }
 
     return false
+}
+
+const fillCell = (gameBoard: GameBoard, position: PlayerPosition): boolean => {
+    gameBoard[position.y][position.x] = 1
+    console.log(gameBoard);
+
+    return true
 }
 
 const moveDown = (position: PlayerPosition, repeat: number, constants: GameConstants) => {
