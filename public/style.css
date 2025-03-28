@@ -22,5 +22,17 @@ td.clue {
 }
 
 td.focused {
-    background-color: red;
+    position: relative;
+}
+
+td.focused::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 4px solid red;
+    z-index: 1;
+    pointer-events: none;
 }
