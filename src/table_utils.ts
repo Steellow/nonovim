@@ -21,9 +21,9 @@ export function loop(num: number): number[] {
 /**
  * Determines if a cell at given table coordinates is part of the top-left blank area.
  */
-export function isBlankCell(colIndex: number, rowIndex: number, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
-    const blankByRow = rowIndex < rowClueAreaWidth
-    const blankByCol = colIndex < colClueAreaHeight
+export function isBlankCell(colIndex: number, rowIndex: number, constants: GameConstants): boolean {
+    const blankByRow = rowIndex < constants.rowClueAreaWidth
+    const blankByCol = colIndex < constants.colClueAreaHeight
 
     return blankByRow && blankByCol
 }
@@ -36,14 +36,16 @@ export function isBlankCell(colIndex: number, rowIndex: number, rowClueAreaWidth
  * @param clues The nonogram clues data.
  * @returns The clue number or null.
  */
-export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): number | null {
+export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants): number | null {
+    const { colClueAreaHeight, rowClueAreaWidth } = constants
+
     // 1. Check if it's in the top-left blank area
-    if (rowIndex < colClueAreaHeight && colIndex < rowClueAreaWidth) {
+    if (isBlankCell(colIndex, rowIndex, constants)) {
         return null;
     }
 
     // 2. Check if it's in the main game grid area
-    if (rowIndex >= colClueAreaHeight && colIndex >= rowClueAreaWidth) {
+    if (isGameBoardArea(rowIndex, colIndex, constants)) {
         return null;
     }
 
@@ -82,11 +84,11 @@ export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues
     return null;
 }
 
-export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
-    const focusOnWholeTableX = rowClueAreaWidth + playerPosition.x
-    const focusOnWholeTableY = colClueAreaHeight + playerPosition.y
+export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, constants: GameConstants): boolean {
+    const playerPositionOnWholeTableX = constants.rowClueAreaWidth + playerPosition.x
+    const playerPositionOnWholeTableY = constants.colClueAreaHeight + playerPosition.y
 
-    const isFocused = cellColIndex === focusOnWholeTableX && cellRowIndex === focusOnWholeTableY
+    const isFocused = cellColIndex === playerPositionOnWholeTableX && cellRowIndex === playerPositionOnWholeTableY
     if (isFocused) {
         console.debug("Focused cell - x:" + cellColIndex + ", y:" + cellRowIndex);
     }
@@ -94,14 +96,14 @@ export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, pla
     return isFocused
 }
 
-export function isFocusedRowOrCol(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
-    const focusOnWholeTableX = rowClueAreaWidth + playerPosition.x
-    const focusOnWholeTableY = colClueAreaHeight + playerPosition.y
+export function isFocusedRowOrCol(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, constants: GameConstants): boolean {
+    const focusOnWholeTableX = constants.rowClueAreaWidth + playerPosition.x
+    const focusOnWholeTableY = constants.colClueAreaHeight + playerPosition.y
 
     return cellColIndex === focusOnWholeTableX || cellRowIndex === focusOnWholeTableY
 }
 
-export function isGameBoardArea(rowIndex: number, colIndex: number, constants: GameConstants) {
+function isGameBoardArea(rowIndex: number, colIndex: number, constants: GameConstants) {
     return rowIndex >= constants.colClueAreaHeight && colIndex >= constants.rowClueAreaWidth
 }
 

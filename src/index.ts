@@ -60,11 +60,9 @@ const Game = () => {
         view: (vnode: Vnode) => {
             return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
                 return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
-                    const isBlank = isBlankCell(rowIndex, colIndex, rowClueAreaWidth, colClueAreaHeight);
+                    const clueValue = getClue(rowIndex, colIndex, clues, constants);
 
-                    const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
-
-                    let classes = getCellCssClass(isBlank, isPlayerPosition(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), isFocusedRowOrCol(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), clueValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
+                    let classes = getCellCssClass(clueValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
 
                     return m("td.cell", {
                         key: `cell-${rowIndex}-${colIndex}`,

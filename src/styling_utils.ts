@@ -1,9 +1,6 @@
-import { isFilledCell, isGameBoardArea } from "./table_utils"
+import { isBlankCell, isFilledCell, isFocusedRowOrCol, isPlayerPosition } from "./table_utils"
 
 export function getCellCssClass(
-    isBlank: boolean,
-    isPlayerPosition: boolean,
-    isFocusedRowOrColumn: boolean,
     clueValue: number | null,
     gameBoard: GameBoard,
     position: PlayerPosition,
@@ -14,16 +11,15 @@ export function getCellCssClass(
 
     const classes = []
 
-    // TODO: Call table_utils.ts here!
-    if (isBlank) {
+    if (isBlankCell(rowIndex, colIndex, constants)) {
         return "blank"
     }
 
-    if (isPlayerPosition) {
+    if (isPlayerPosition(rowIndex, colIndex, position, constants)) {
         classes.push("player-position")
     }
 
-    if (isFocusedRowOrColumn) {
+    if (isFocusedRowOrCol(rowIndex, colIndex, position, constants)) {
         classes.push("focused")
     }
 
