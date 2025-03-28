@@ -37,7 +37,7 @@ interface GameConstants {
     tableTotalWidth: number;
 }
 
-type CellValue = number | "X" | null
+type CellValue = number | "×" | null
 
 type ActionKeyCodes = "KeyS" | "KeyD" | "KeyF"
 

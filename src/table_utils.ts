@@ -31,7 +31,7 @@ export function isBlankCell(colIndex: number, rowIndex: number, constants: GameC
 /**
  * Returns cell value
  * If a number, then it's a clue
- * If "X", then it's a crossed cell
+ * If "×", then it's a crossed cell
  */
 export function getCellValue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants, gameBoard: GameBoard): CellValue {
     // 1. Check if it's in the top-left blank area
@@ -41,7 +41,7 @@ export function getCellValue(rowIndex: number, colIndex: number, clues: Nonogram
 
     // 2. Check if it's in the main game grid area
     if (isCrossedCell(rowIndex, colIndex, constants, gameBoard)) {
-        return "X"
+        return "×"
     }
 
     return getClue(rowIndex, colIndex, clues, constants)
