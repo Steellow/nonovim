@@ -47,3 +47,8 @@ td.filled {
     background-color: rgb(13, 13, 13);
     box-shadow: inset 0 0 0 1px white;
 }
+
+td.crossed {
+    text-align: center;
+    vertical-align: middle;
+}

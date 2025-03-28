@@ -29,25 +29,26 @@ export function isBlankCell(colIndex: number, rowIndex: number, constants: GameC
 }
 
 /**
- * Gets the specific clue number to display at given table coordinates.
- * Returns null if the cell is blank, part of the game grid, or an empty clue slot.
- * @param rowIndex The row index in the overall table grid.
- * @param colIndex The column index in the overall table grid.
- * @param clues The nonogram clues data.
- * @returns The clue number or null.
+ * Returns cell value
+ * If a number, then it's a clue
+ * If "X", then it's a crossed cell
  */
-export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants): number | null {
-    const { colClueAreaHeight, rowClueAreaWidth } = constants
-
+export function getCellValue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants, gameBoard: GameBoard): CellValue {
     // 1. Check if it's in the top-left blank area
     if (isBlankCell(colIndex, rowIndex, constants)) {
         return null;
     }
 
     // 2. Check if it's in the main game grid area
-    if (isGameBoardArea(rowIndex, colIndex, constants)) {
-        return null;
+    if (isCrossedCell(rowIndex, colIndex, constants, gameBoard)) {
+        return "X"
     }
+
+    return getClue(rowIndex, colIndex, clues, constants)
+}
+
+function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants): number | null {
+    const { colClueAreaHeight, rowClueAreaWidth } = constants
 
     // 3. Check if it's in the top (column clues) area
     if (rowIndex < colClueAreaHeight && colIndex >= rowClueAreaWidth) {
@@ -84,6 +85,10 @@ export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues
     return null;
 }
 
+function isCrossedCell(rowIndex: number, colIndex: number, constants: GameConstants, gameBoard: GameBoard): boolean {
+    return isGameBoardArea(rowIndex, colIndex, constants) && getCellState(rowIndex, colIndex, gameBoard, constants) === 2
+}
+
 export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, constants: GameConstants): boolean {
     const playerPositionOnWholeTableX = constants.rowClueAreaWidth + playerPosition.x
     const playerPositionOnWholeTableY = constants.colClueAreaHeight + playerPosition.y
@@ -107,9 +112,9 @@ function isGameBoardArea(rowIndex: number, colIndex: number, constants: GameCons
     return rowIndex >= constants.colClueAreaHeight && colIndex >= constants.rowClueAreaWidth
 }
 
-export function isFilledCell(rowIndex: number, colIndex: number, gameBoard: GameBoard, constants: GameConstants) {
+export function getCellState(rowIndex: number, colIndex: number, gameBoard: GameBoard, constants: GameConstants): CellState | null {
     if (!isGameBoardArea(rowIndex, colIndex, constants)) {
-        return false
+        return null
     }
 
     const gameBoardX = rowIndex - constants.colClueAreaHeight

@@ -1,7 +1,7 @@
-import { isBlankCell, isFilledCell, isFocusedRowOrCol, isPlayerPosition } from "./table_utils"
+import { isBlankCell, getCellState, isFocusedRowOrCol, isPlayerPosition } from "./table_utils"
 
 export function getCellCssClass(
-    clueValue: number | null,
+    cellValue: CellValue,
     gameBoard: GameBoard,
     position: PlayerPosition,
     rowIndex: number,
@@ -23,12 +23,15 @@ export function getCellCssClass(
         classes.push("focused")
     }
 
-    if (clueValue !== null) {
+    if (typeof cellValue === "number") {
         classes.push("clue")
     }
 
-    if (isFilledCell(rowIndex, colIndex, gameBoard, constants)) {
+    const cellState = getCellState(rowIndex, colIndex, gameBoard, constants)
+    if (cellState === 1) {
         classes.push("filled")
+    } else if (cellState === 2) {
+        classes.push("crossed")
     }
 
 

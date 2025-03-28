@@ -17,9 +17,14 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
         case "KeyL":
             return moveRight(position, keyboardBuffer.repeat, constants)
 
-        // Paint
         case "KeyF":
-            return fillCell(gameBoard, position)
+            return changeCellState(gameBoard, position, 1)
+
+        case "KeyD":
+            return changeCellState(gameBoard, position, 2)
+
+        case "KeyS":
+            return changeCellState(gameBoard, position, 0)
 
         default:
             // Store repeat action
@@ -32,9 +37,8 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
     return false
 }
 
-const fillCell = (gameBoard: GameBoard, position: PlayerPosition): boolean => {
-    gameBoard[position.y][position.x] = 1
-    console.log(gameBoard);
+const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, state: CellState): boolean => {
+    gameBoard[position.y][position.x] = state
 
     return true
 }

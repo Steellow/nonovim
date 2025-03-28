@@ -1,5 +1,5 @@
 import m, { Vnode } from 'mithril';
-import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedRowOrCol, isPlayerPosition, loop } from './table_utils';
+import { getCellValue, getMaxClueLength, initializeEmptyBoard, loop } from './table_utils';
 import { getCellCssClass } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
 
@@ -60,9 +60,9 @@ const Game = () => {
         view: (vnode: Vnode) => {
             return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
                 return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
-                    const clueValue = getClue(rowIndex, colIndex, clues, constants);
+                    const cellValue = getCellValue(rowIndex, colIndex, clues, constants, gameBoard)
 
-                    let classes = getCellCssClass(clueValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
+                    let classes = getCellCssClass(cellValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
 
                     return m("td.cell", {
                         key: `cell-${rowIndex}-${colIndex}`,
@@ -73,7 +73,7 @@ const Game = () => {
                         },
                     },
                         // colIndex + "," + rowIndex
-                        clueValue
+                        cellValue
                     )
                 }))
             })

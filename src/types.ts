@@ -36,4 +36,4 @@ interface GameConstants {
     tableTotalWidth: number;
 }
 
-type MoveDirection = "left" | "right" | "up" | "down"
+type CellValue = number | "X" | null
