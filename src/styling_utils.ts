@@ -1,9 +1,14 @@
-export function getCellCssClass(isBlank: boolean, isFocused: boolean, clueValue: number | null): CellCssClass {
+export function getCellCssClass(isBlank: boolean, isPlayerPosition: boolean,
+    isFocusedRowOrColumn: boolean, clueValue: number | null): CellCssClass {
     if (isBlank) {
         return "blank"
     }
 
-    if (isFocused) {
+    if (isPlayerPosition) {
+        return "player-position"
+    }
+
+    if (isFocusedRowOrColumn) {
         return "focused"
     }
 

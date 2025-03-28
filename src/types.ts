@@ -36,6 +36,6 @@ interface GameConstants {
     tableTotalWidth: number;
 }
 
-type CellCssClass = "blank" | "clue" | "focused" | ""
+type CellCssClass = "blank" | "clue" | "focused" | "player-position" | ""
 
 type MoveDirection = "left" | "right" | "up" | "down"

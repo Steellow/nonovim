@@ -82,7 +82,7 @@ export function getClue(rowIndex: number, colIndex: number, clues: NonogramClues
     return null;
 }
 
-export function isFocusedCell(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, clues: NonogramClues, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
+export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
     const focusOnWholeTableX = rowClueAreaWidth + playerPosition.x
     const focusOnWholeTableY = colClueAreaHeight + playerPosition.y
 
@@ -92,4 +92,11 @@ export function isFocusedCell(cellRowIndex: number, cellColIndex: number, player
     }
 
     return isFocused
+}
+
+export function isFocusedRowOrCol(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, rowClueAreaWidth: number, colClueAreaHeight: number): boolean {
+    const focusOnWholeTableX = rowClueAreaWidth + playerPosition.x
+    const focusOnWholeTableY = colClueAreaHeight + playerPosition.y
+
+    return cellColIndex === focusOnWholeTableX || cellRowIndex === focusOnWholeTableY
 }

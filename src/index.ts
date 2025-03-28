@@ -1,5 +1,5 @@
 import m, { Vnode } from 'mithril';
-import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedCell, loop } from './table_utils';
+import { getClue, getMaxClueLength, initializeEmptyBoard, isBlankCell, isFocusedRowOrCol, isPlayerPosition, loop } from './table_utils';
 import { getCellCssClass } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
 
@@ -16,7 +16,7 @@ const Game = () => {
     const colClueAreaHeight = getMaxClueLength(clues.cols)
 
     const constants: GameConstants = {
-        cellSize: 50,
+        cellSize: 25,
         rowClueAreaWidth: rowClueAreaWidth,
         colClueAreaHeight: colClueAreaHeight,
         tableTotalWidth: clues.cols.length + rowClueAreaWidth,
@@ -58,11 +58,10 @@ const Game = () => {
             return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
                 return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
                     const isBlank = isBlankCell(rowIndex, colIndex, rowClueAreaWidth, colClueAreaHeight);
-                    const isFocused = isFocusedCell(rowIndex, colIndex, playerPosition, clues, rowClueAreaWidth, colClueAreaHeight)
 
                     const clueValue = getClue(rowIndex, colIndex, clues, rowClueAreaWidth, colClueAreaHeight);
 
-                    let cellTypeClass = getCellCssClass(isBlank, isFocused, clueValue)
+                    let cellTypeClass = getCellCssClass(isBlank, isPlayerPosition(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), isFocusedRowOrCol(rowIndex, colIndex, playerPosition, rowClueAreaWidth, colClueAreaHeight), clueValue)
 
                     return m("td.cell", {
                         key: `cell-${rowIndex}-${colIndex}`,
