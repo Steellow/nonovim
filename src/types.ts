@@ -31,6 +31,8 @@ interface GameConstants {
     cellSize: number;
     rowClueAreaWidth: number;
     colClueAreaHeight: number;
+    gameWidth: number;
+    gameHeight: number;
 }
 
 type CellValue = number | "×" | null

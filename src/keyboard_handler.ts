@@ -94,16 +94,16 @@ const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constant
 const getMovementBoundaryCheck = (direction: MoveDirection, position: PlayerPosition, constants: GameConstants): () => boolean => {
     switch (direction) {
         case "left":
-            return () => position.x + constants.rowClueAreaWidth > constants.rowClueAreaWidth
+            return () => position.x > 0
 
         case "right":
-            return () => position.x + constants.rowClueAreaWidth < constants.tableTotalWidth - 1
+            return () => position.x < constants.gameWidth - 1
 
         case "up":
-            return () => position.y + constants.colClueAreaHeight > constants.colClueAreaHeight
+            return () => position.y > 0
 
         case "down":
-            return () => position.y + constants.colClueAreaHeight < constants.tableTotalHeight - 1
+            return () => position.y < constants.gameHeight - 1
     }
 }
 
