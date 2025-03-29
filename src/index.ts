@@ -142,7 +142,7 @@ const Game = () => {
                     m("table.line-number",
                         m("tr.line-number", loop(gameWidth).map(colIndex =>
                             m("td.line-number.top-align", { style: getCellSize(constants.cellSize), },
-                                getRelativeLineNumber(colIndex, playerPosition.y)
+                                getRelativeLineNumber(colIndex, playerPosition.x)
                             )
                         )
                         )
