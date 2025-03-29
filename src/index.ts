@@ -1,6 +1,6 @@
 import m, { Vnode } from 'mithril';
 import { getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initializeEmptyBoard, loop } from './table_utils';
-import { getCellCssClass, getCellSize } from './styling_utils';
+import { getCellCssClass, getCellSize, isFocusedColumn } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
 
 
@@ -81,7 +81,11 @@ const Game = () => {
                     // Column (top) clues
                     m("table", loop(constants.colClueAreaHeight).map(nthClueFromTop =>
                         m("tr", loop(gameWidth).map(nthClueFromLeft =>
-                            m("td.clue", { style: getCellSize(constants.cellSize) },
+                            m("td.clue",
+                                {
+                                    style: getCellSize(constants.cellSize),
+                                    class: isFocusedColumn(nthClueFromLeft, playerPosition.x)
+                                },
                                 getTopClue(
                                     clues.top,
                                     nthClueFromLeft,
@@ -98,7 +102,10 @@ const Game = () => {
                     // Row (left) clues
                     m("table", loop(gameHeight).map(nthClueFromTop =>
                         m("tr", loop(constants.rowClueAreaWidth).map(nthClueFromLeft =>
-                            m("td.clue", { style: getCellSize(constants.cellSize) },
+                            m("td.clue", {
+                                style: getCellSize(constants.cellSize),
+                                class: isFocusedColumn(nthClueFromTop, playerPosition.y)
+                            },
                                 getLeftClue(
                                     clues.left,
                                     nthClueFromLeft,

@@ -70,7 +70,7 @@ td.crossed::after {
 
 /* Focused row/column, but not the player position */
 td.focused {
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(240, 229, 229);
 }
 
 td.filled {
