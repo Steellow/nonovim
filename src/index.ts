@@ -119,13 +119,33 @@ const Game = () => {
                     )),
 
                     // Row line numbers
-                    m("table", loop(gameHeight).map(rowIndex =>
-                        m("tr",
+                    m("table.line-number", loop(gameHeight).map(rowIndex =>
+                        m("tr.line-number",
                             m("td.line-number",
-                                //  getRelativeLineNumber(rowIndex, playerPosition.y)
+                                getRelativeLineNumber(rowIndex, playerPosition.y)
                             )
                         )
                     )
+                    )
+                ]),
+
+                m("div.row", [
+
+                    // Bottom left empty space
+                    m("table.blank",
+                        m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
+                            m("td.blank", { style: getCellSize(constants.cellSize) })
+                        ))
+                    ),
+
+                    // Column line numbers
+                    m("table.line-number",
+                        m("tr.line-number", loop(gameWidth).map(colIndex =>
+                            m("td.line-number.top-align", { style: getCellSize(constants.cellSize), },
+                                getRelativeLineNumber(colIndex, playerPosition.y)
+                            )
+                        )
+                        )
                     )
                 ])
             ])

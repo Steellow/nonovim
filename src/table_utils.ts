@@ -60,3 +60,5 @@ export const getLeftClue = (
 
     return cluesForThisRow[nthClueFromLeft - offset]
 }
+
+export const getRelativeLineNumber = (index: number, playerPosition: number): number => Math.abs(playerPosition - index)
