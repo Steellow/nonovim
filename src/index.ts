@@ -19,10 +19,6 @@ const Game = () => {
         cellSize: 25,
         rowClueAreaWidth: rowClueAreaWidth,
         colClueAreaHeight: colClueAreaHeight,
-
-        // obsolete?
-        tableTotalWidth: clues.top.length + rowClueAreaWidth,
-        tableTotalHeight: clues.left.length + colClueAreaHeight,
     }
 
     console.debug("constants: " + constants);

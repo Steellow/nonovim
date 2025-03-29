@@ -31,10 +31,6 @@ interface GameConstants {
     cellSize: number;
     rowClueAreaWidth: number;
     colClueAreaHeight: number;
-
-    // Table total size containing board, clues and empty area
-    tableTotalHeight: number;
-    tableTotalWidth: number;
 }
 
 type CellValue = number | "×" | null
