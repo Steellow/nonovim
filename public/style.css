@@ -81,7 +81,7 @@ td.filled {
 table.line-number,
 tr.line-number,
 td.line-number {
-    border: none;
+    border: 1px solid white;
 }
 
 td.line-number {
