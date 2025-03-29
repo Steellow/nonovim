@@ -7,8 +7,8 @@ interface TableAttrs {
 type ClueSet = number[]
 
 interface NonogramClues {
-    cols: ClueSet[],
-    rows: ClueSet[]
+    top: ClueSet[],
+    left: ClueSet[]
 }
 
 // Represents the state of a single cell (e.g., 0: empty, 1: filled, 2: marked 'X')

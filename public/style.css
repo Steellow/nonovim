@@ -2,6 +2,10 @@ body {
     font-family: sans-serif;
 }
 
+.row {
+    display: flex;
+}
+
 td,
 th,
 table {
@@ -13,13 +17,13 @@ table {
 
 td {
     font-size: large;
-
 }
 
+table.blank,
 td.blank {
-    border: none;
+    /* Same as background color, to keep the spacing right */
+    border: 1px solid white;
 }
-
 
 td.player-position {
     position: relative;
@@ -27,12 +31,25 @@ td.player-position {
 }
 
 td.player-position::after {
-    content: '';
+    content: "×";
     position: absolute;
     inset: -4px;
     border: 4px solid red;
     z-index: 1;
     pointer-events: none;
+
+    /* Center the "×" */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+td.player-position:not(.crossed)::after {
+    content: "";
+}
+
+td.crossed::after {
+    content: "×";
 }
 
 /* Focused row/column, but not the player position */
@@ -43,9 +60,4 @@ td.focused {
 td.filled {
     background-color: rgb(69, 69, 69);
     box-shadow: inset 0 0 0 2px white;
-}
-
-td.crossed {
-    text-align: center;
-    vertical-align: middle;
 }

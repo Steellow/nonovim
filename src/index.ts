@@ -1,6 +1,6 @@
 import m, { Vnode } from 'mithril';
-import { getCellValue, getMaxClueLength, initializeEmptyBoard, loop } from './table_utils';
-import { getCellCssClass } from './styling_utils';
+import { getLeftClue, getMaxClueLength, getTopClue, initializeEmptyBoard, loop } from './table_utils';
+import { getCellCssClass, getCellSize } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
 
 
@@ -8,19 +8,21 @@ const Game = () => {
 
     // Temp, for game
     const clues: NonogramClues = {
-        cols: [[1], [6], [1], [2]],
-        rows: [[2], [1], [1], [1], [3], [1, 1]],
+        top: [[1], [6], [1], [2]],
+        left: [[2], [1], [1], [1], [3], [1, 1]],
     }
 
-    const rowClueAreaWidth = getMaxClueLength(clues.rows)
-    const colClueAreaHeight = getMaxClueLength(clues.cols)
+    const rowClueAreaWidth = getMaxClueLength(clues.left)
+    const colClueAreaHeight = getMaxClueLength(clues.top)
 
     const constants: GameConstants = {
         cellSize: 25,
         rowClueAreaWidth: rowClueAreaWidth,
         colClueAreaHeight: colClueAreaHeight,
-        tableTotalWidth: clues.cols.length + rowClueAreaWidth,
-        tableTotalHeight: clues.rows.length + colClueAreaHeight,
+
+        // obsolete?
+        tableTotalWidth: clues.top.length + rowClueAreaWidth,
+        tableTotalHeight: clues.left.length + colClueAreaHeight,
     }
 
     console.debug("constants: " + constants);
@@ -59,26 +61,64 @@ const Game = () => {
         },
 
         view: (vnode: Vnode) => {
-            return m('table', loop(constants.tableTotalHeight).map(rowIndex => {
-                return m("tr", loop(constants.tableTotalWidth).map(colIndex => {
-                    const cellValue = getCellValue(rowIndex, colIndex, clues, constants, gameBoard)
 
-                    let classes = getCellCssClass(cellValue, gameBoard, playerPosition, rowIndex, colIndex, constants)
+            return m('div', [
+                m("div.row", [
 
-                    return m("td.cell", {
-                        key: `cell-${rowIndex}-${colIndex}`,
-                        class: classes,
-                        style: {
-                            height: `${constants.cellSize}px`,
-                            width: `${constants.cellSize}px`,
-                        },
-                    },
-                        // colIndex + "," + rowIndex
-                        cellValue
-                    )
-                }))
-            })
-            )
+                    // Empty space on top left
+                    m("table.blank", loop(constants.colClueAreaHeight).map(_ =>
+                        m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
+                            m("td.blank", { style: getCellSize(constants.cellSize) })
+                        ))
+                    )),
+
+                    // Column (top) clues
+                    m("table", loop(constants.colClueAreaHeight).map(nthClueFromTop =>
+                        m("tr", loop(clues.top.length).map(nthClueFromLeft =>
+                            m("td.clue", { style: getCellSize(constants.cellSize) },
+                                getTopClue(
+                                    clues.top,
+                                    nthClueFromLeft,
+                                    nthClueFromTop,
+                                )
+                            )
+                        ))
+                    ))
+                ]),
+
+                m("div.row", [
+
+                    // Row (left) clues
+                    m("table", loop(clues.left.length).map(nthClueFromTop =>
+                        m("tr", loop(constants.rowClueAreaWidth).map(nthClueFromLeft =>
+                            m("td.clue", { style: getCellSize(constants.cellSize) },
+                                getLeftClue(
+                                    clues.left,
+                                    nthClueFromLeft,
+                                    nthClueFromTop,
+                                    constants.rowClueAreaWidth
+                                )
+                            )
+                        ))
+                    )),
+
+                    // Play area
+                    m("table", loop(clues.left.length).map(rowIndex =>
+                        m("tr", loop(clues.top.length).map(colIndex => {
+                            let classes = getCellCssClass(gameBoard, playerPosition, rowIndex, colIndex)
+
+                            return m("td", {
+                                style: getCellSize(constants.cellSize),
+                                className: classes
+                            },
+                                // colIndex + "," + rowIndex
+                                // cellValue
+                            )
+                        }))
+                    ))
+
+                ])
+            ])
         }
     }
 }

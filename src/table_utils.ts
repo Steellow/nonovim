@@ -1,6 +1,6 @@
 export function initializeEmptyBoard(clues: NonogramClues): GameBoard {
-    const numRows = clues.rows.length;
-    const numCols = clues.cols.length;
+    const numRows = clues.left.length;
+    const numCols = clues.top.length;
     // Initialize with '0' for empty state
     return Array.from({ length: numRows }, () => Array(numCols).fill(0));
 }
@@ -18,107 +18,45 @@ export function loop(num: number): number[] {
     return Array.from({ length: num }, (_, i) => i)
 }
 
-/**
- * Determines if a cell at given table coordinates is part of the top-left blank area.
- */
-export function isBlankCell(colIndex: number, rowIndex: number, constants: GameConstants): boolean {
-    const blankByRow = rowIndex < constants.rowClueAreaWidth
-    const blankByCol = colIndex < constants.colClueAreaHeight
+export const isPlayerPosition = (cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition) => cellColIndex === playerPosition.x && cellRowIndex === playerPosition.y
 
-    return blankByRow && blankByCol
+export const isFocusedRowOrCol = (cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition) => cellColIndex === playerPosition.x || cellRowIndex === playerPosition.y
+
+export const getCellState = (rowIndex: number, colIndex: number, gameBoard: GameBoard): CellState => {
+    return gameBoard[rowIndex][colIndex]
 }
 
-/**
- * Returns cell value
- * If a number, then it's a clue
- * If "×", then it's a crossed cell
- */
-export function getCellValue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants, gameBoard: GameBoard): CellValue {
-    // 1. Check if it's in the top-left blank area
-    if (isBlankCell(colIndex, rowIndex, constants)) {
-        return null;
-    }
+// Returns the clue which should be shown in cell,
+// if no clue in that cell, returns null
+export const getTopClue = (
+    clues: ClueSet[],
+    nthClueFromLeft: number,
+    nthClueFromTop: number): number | null => {
+    const cluesForThisColumn = clues[nthClueFromLeft]
 
-    // 2. Check if it's in the main game grid area
-    if (isCrossedCell(rowIndex, colIndex, constants, gameBoard)) {
-        return "×"
-    }
-
-    return getClue(rowIndex, colIndex, clues, constants)
-}
-
-function getClue(rowIndex: number, colIndex: number, clues: NonogramClues, constants: GameConstants): number | null {
-    const { colClueAreaHeight, rowClueAreaWidth } = constants
-
-    // 3. Check if it's in the top (column clues) area
-    if (rowIndex < colClueAreaHeight && colIndex >= rowClueAreaWidth) {
-        const actualGameColIndex = colIndex - rowClueAreaWidth;
-        const targetColClues = clues.cols[actualGameColIndex];
-
-        // Calculate index within the specific column clue array
-        // Clues are aligned to the bottom edge (closer to the game grid)
-        const clueIndexInSet = targetColClues.length - (colClueAreaHeight - rowIndex);
-
-        if (clueIndexInSet >= 0 && clueIndexInSet < targetColClues.length) {
-            return targetColClues[clueIndexInSet];
-        } else {
-            return null; // Empty slot in the column clue area
-        }
-    }
-
-    // 4. Check if it's in the left (row clues) area
-    if (rowIndex >= colClueAreaHeight && colIndex < rowClueAreaWidth) {
-        const actualGameRowIndex = rowIndex - colClueAreaHeight;
-        const targetRowClues = clues.rows[actualGameRowIndex];
-
-        // Calculate index within the specific row clue array
-        // Clues are aligned to the right edge (closer to the game grid)
-        const clueIndexInSet = targetRowClues.length - (rowClueAreaWidth - colIndex);
-
-        if (clueIndexInSet >= 0 && clueIndexInSet < targetRowClues.length) {
-            return targetRowClues[clueIndexInSet];
-        } else {
-            return null; // Empty slot in the row clue area
-        }
-    }
-
-    return null;
-}
-
-function isCrossedCell(rowIndex: number, colIndex: number, constants: GameConstants, gameBoard: GameBoard): boolean {
-    return isGameBoardArea(rowIndex, colIndex, constants) && getCellState(rowIndex, colIndex, gameBoard, constants) === 2
-}
-
-export function isPlayerPosition(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, constants: GameConstants): boolean {
-    const playerPositionOnWholeTableX = constants.rowClueAreaWidth + playerPosition.x
-    const playerPositionOnWholeTableY = constants.colClueAreaHeight + playerPosition.y
-
-    const isFocused = cellColIndex === playerPositionOnWholeTableX && cellRowIndex === playerPositionOnWholeTableY
-    if (isFocused) {
-        console.debug("Focused cell - x:" + cellColIndex + ", y:" + cellRowIndex);
-    }
-
-    return isFocused
-}
-
-export function isFocusedRowOrCol(cellRowIndex: number, cellColIndex: number, playerPosition: PlayerPosition, constants: GameConstants): boolean {
-    const focusOnWholeTableX = constants.rowClueAreaWidth + playerPosition.x
-    const focusOnWholeTableY = constants.colClueAreaHeight + playerPosition.y
-
-    return cellColIndex === focusOnWholeTableX || cellRowIndex === focusOnWholeTableY
-}
-
-function isGameBoardArea(rowIndex: number, colIndex: number, constants: GameConstants) {
-    return rowIndex >= constants.colClueAreaHeight && colIndex >= constants.rowClueAreaWidth
-}
-
-export function getCellState(rowIndex: number, colIndex: number, gameBoard: GameBoard, constants: GameConstants): CellState | null {
-    if (!isGameBoardArea(rowIndex, colIndex, constants)) {
+    if (nthClueFromTop >= cluesForThisColumn.length) {
         return null
     }
 
-    const gameBoardX = rowIndex - constants.colClueAreaHeight
-    const gameBoardY = colIndex - constants.rowClueAreaWidth
+    return cluesForThisColumn[nthClueFromTop]
+}
 
-    return gameBoard[gameBoardX][gameBoardY]
+// Returns the clue which should be shown in cell,
+// if no clue in that cell, returns null
+export const getLeftClue = (
+    clues: ClueSet[],
+    nthClueFromLeft: number,
+    nthClueFromTop: number,
+    rowClueAreaWidth: number
+): number | null => {
+    const cluesForThisRow = clues[nthClueFromTop]
+
+    // Calculate the left offset so that clues are right-aligned
+    const offset = rowClueAreaWidth - cluesForThisRow.length
+
+    if (nthClueFromLeft < offset) {
+        return null
+    }
+
+    return cluesForThisRow[nthClueFromLeft - offset]
 }

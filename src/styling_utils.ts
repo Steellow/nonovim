@@ -1,33 +1,23 @@
-import { isBlankCell, getCellState, isFocusedRowOrCol, isPlayerPosition } from "./table_utils"
+import { getCellState, isFocusedRowOrCol, isPlayerPosition } from "./table_utils"
 
 export function getCellCssClass(
-    cellValue: CellValue,
     gameBoard: GameBoard,
     position: PlayerPosition,
     rowIndex: number,
     colIndex: number,
-    constants: GameConstants,
 ): string {
 
     const classes = []
 
-    if (isBlankCell(rowIndex, colIndex, constants)) {
-        return "blank"
-    }
-
-    if (isPlayerPosition(rowIndex, colIndex, position, constants)) {
+    if (isPlayerPosition(rowIndex, colIndex, position)) {
         classes.push("player-position")
     }
 
-    if (isFocusedRowOrCol(rowIndex, colIndex, position, constants)) {
+    if (isFocusedRowOrCol(rowIndex, colIndex, position)) {
         classes.push("focused")
     }
 
-    if (typeof cellValue === "number") {
-        classes.push("clue")
-    }
-
-    const cellState = getCellState(rowIndex, colIndex, gameBoard, constants)
+    const cellState = getCellState(rowIndex, colIndex, gameBoard)
     if (cellState === 1) {
         classes.push("filled")
     } else if (cellState === 2) {
@@ -37,3 +27,5 @@ export function getCellCssClass(
 
     return classes.join(" ")
 }
+
+export const getCellSize = (size: number) => ({ height: `${size}px`, width: `${size}px` });
