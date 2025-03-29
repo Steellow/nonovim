@@ -7,9 +7,14 @@ import { handleKeyPress } from './keyboard_handler';
 const Game = () => {
 
     // Temp, for game
+    // const clues: NonogramClues = {
+    //     top: [[1], [6], [1], [2]],
+    //     left: [[2], [1], [1], [1], [3], [1, 1]],
+    // }
+
     const clues: NonogramClues = {
-        top: [[1], [6], [1], [2]],
-        left: [[2], [1], [1], [1], [3], [1, 1]],
+        top: [[1], [2, 3], [4, 1, 1], [1, 3], [1, 1, 1, 2], [1, 1, 2], [4, 1, 1], [1, 1], [1, 1], [5]],
+        left: [[3], [1, 1], [1, 1, 1], [3, 1], [5, 1], [1, 1, 1], [1, 4], [1, 1, 1], [1, 2, 2], [2, 3, 1]]
     }
 
     const gameHeight = clues.left.length
@@ -81,6 +86,7 @@ const Game = () => {
                                     clues.top,
                                     nthClueFromLeft,
                                     nthClueFromTop,
+                                    constants.colClueAreaHeight
                                 )
                             )
                         ))

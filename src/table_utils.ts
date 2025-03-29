@@ -26,20 +26,22 @@ export const getCellState = (rowIndex: number, colIndex: number, gameBoard: Game
     return gameBoard[rowIndex][colIndex]
 }
 
-// Returns the clue which should be shown in cell,
-// if no clue in that cell, returns null
 export const getTopClue = (
     clues: ClueSet[],
     nthClueFromLeft: number,
-    nthClueFromTop: number): number | null => {
+    nthClueFromTop: number,
+    topClueAreaHeight: number
+): number | null => {
     const cluesForThisColumn = clues[nthClueFromLeft]
+    const offset = topClueAreaHeight - cluesForThisColumn.length
 
-    if (nthClueFromTop >= cluesForThisColumn.length) {
+    if (nthClueFromTop < offset) {
         return null
     }
 
-    return cluesForThisColumn[nthClueFromTop]
+    return cluesForThisColumn[nthClueFromTop - offset]
 }
+
 
 // Returns the clue which should be shown in cell,
 // if no clue in that cell, returns null
@@ -50,8 +52,6 @@ export const getLeftClue = (
     rowClueAreaWidth: number
 ): number | null => {
     const cluesForThisRow = clues[nthClueFromTop]
-
-    // Calculate the left offset so that clues are right-aligned
     const offset = rowClueAreaWidth - cluesForThisRow.length
 
     if (nthClueFromLeft < offset) {
