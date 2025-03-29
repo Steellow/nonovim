@@ -19,6 +19,22 @@ td {
     font-size: large;
 }
 
+td:nth-child(5n) {
+    border-right: 2px solid rgb(69, 69, 69);
+}
+
+tr:nth-child(5n) {
+    border-bottom: 2px solid rgb(69, 69, 69);
+}
+
+/* td:nth-child(10n + 6),
+td:nth-child(10n + 7),
+td:nth-child(10n + 8),
+td:nth-child(10n + 9),
+td:nth-child(10n + 10) {
+    background-color: lightgreen;
+} */
+
 table.blank,
 td.blank {
     /* Same as background color, to keep the spacing right */
@@ -70,6 +86,7 @@ td.line-number {
 
 td.line-number {
     font-size: medium;
+    background-color: white;
 }
 
 .top-align {
