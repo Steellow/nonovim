@@ -1,4 +1,4 @@
-import { getGameboardColumnStatesAsArray } from "./gameboard_util"
+import { getGameboardColumnStatesAsArray } from "./gameboard_utils"
 
 export const initCluesWithState = (clues: Clues): CluesWithState => {
     const top = clues.top.map(clueSet =>
@@ -156,3 +156,48 @@ const resetClueStates = (clues: ClueWithState[]) => {
         clue.crossed = false
     })
 }
+
+/**
+ * Returns the maximum length among all clue arrays in a set.
+ * Example: maxClues([[1], [2, 3], [4]]) returns 2.
+ */
+export const getMaxClueLength = (clues: ClueSet[]): number => clues.reduce(
+    (longestSoFar, currentArray) =>
+        currentArray.length > longestSoFar.length ? currentArray : longestSoFar,
+    clues[0]).length
+
+export const getTopClue = (
+    clues: ClueSetWithState[],
+    nthClueFromLeft: number,
+    nthClueFromTop: number,
+    topClueAreaHeight: number
+): ClueWithState | null => {
+    const cluesForThisColumn = clues[nthClueFromLeft]
+    const offset = topClueAreaHeight - cluesForThisColumn.length
+
+    if (nthClueFromTop < offset) {
+        return null
+    }
+
+    return cluesForThisColumn[nthClueFromTop - offset]
+}
+
+// Returns the clue which should be shown in cell,
+// if no clue in that cell, returns null
+export const getLeftClue = (
+    clues: ClueSetWithState[],
+    nthClueFromLeft: number,
+    nthClueFromTop: number,
+    rowClueAreaWidth: number
+): ClueWithState | null => {
+    const cluesForThisRow = clues[nthClueFromTop]
+    const offset = rowClueAreaWidth - cluesForThisRow.length
+
+    if (nthClueFromLeft < offset) {
+        return null
+    }
+
+    return cluesForThisRow[nthClueFromLeft - offset]
+}
+
+export const getRelativeLineNumber = (index: number, playerPosition: number): number => Math.abs(playerPosition - index)

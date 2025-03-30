@@ -1,8 +1,8 @@
 import m, { Vnode } from 'mithril';
-import { getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initializeEmptyBoard, loop } from './table_utils';
-import { getCellCssClass, getCellSize } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
-import { getClueClasses, initCluesWithState } from './clue_util';
+import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
+import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
+import { getCellSize, loop } from './table_utils';
 
 
 const Game = () => {
@@ -20,9 +20,7 @@ const Game = () => {
     const rowClueAreaWidth = getMaxClueLength(clues.left)
     const colClueAreaHeight = getMaxClueLength(clues.top)
 
-    // constants might not be needed?
     const constants: GameConstants = {
-        cellSize: 25,
         rowClueAreaWidth: rowClueAreaWidth,
         colClueAreaHeight: colClueAreaHeight,
         gameHeight: gameHeight,
@@ -51,6 +49,8 @@ const Game = () => {
         }
     }
 
+    const cellSize = getCellSize(25)
+
     return {
 
         oncreate: (vnode: Vnode) => {
@@ -71,7 +71,7 @@ const Game = () => {
                     // Empty space on top left
                     m("table.blank", loop(constants.colClueAreaHeight).map(_ =>
                         m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
-                            m("td.blank", { style: getCellSize(constants.cellSize) })
+                            m("td.blank", { style: cellSize })
                         ))
                     )),
 
@@ -88,7 +88,7 @@ const Game = () => {
 
                             return m("td.clue",
                                 {
-                                    style: getCellSize(constants.cellSize),
+                                    style: cellSize,
                                     class: getClueClasses(nthClueFromLeft, playerPosition.x, clue)
                                 },
                                 clue?.clue
@@ -112,7 +112,7 @@ const Game = () => {
                             )
 
                             return m("td.clue", {
-                                style: getCellSize(constants.cellSize),
+                                style: cellSize,
                                 class: getClueClasses(nthClueFromTop, playerPosition.y, clue)
                             },
                                 clue?.clue
@@ -124,17 +124,13 @@ const Game = () => {
 
                     // Play area
                     m("table", loop(gameHeight).map(rowIndex =>
-                        m("tr", loop(gameWidth).map(colIndex => {
-                            let classes = getCellCssClass(gameBoard, playerPosition, rowIndex, colIndex)
-
-                            return m("td", {
-                                style: getCellSize(constants.cellSize),
-                                className: classes
-                            },
-                                // colIndex + "," + rowIndex
-                                // cellValue
-                            )
-                        }))
+                        m("tr", loop(gameWidth).map(colIndex => m("td", {
+                            style: cellSize,
+                            className: getCellClasses(gameBoard, playerPosition, rowIndex, colIndex)
+                        },
+                            // colIndex + "," + rowIndex
+                        )
+                        ))
                     )),
 
                     // Row line numbers
@@ -153,14 +149,14 @@ const Game = () => {
                     // Bottom left empty space
                     m("table.blank",
                         m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
-                            m("td.blank", { style: getCellSize(constants.cellSize) })
+                            m("td.blank", { style: cellSize })
                         ))
                     ),
 
                     // Column line numbers
                     m("table.line-number",
                         m("tr.line-number", loop(gameWidth).map(colIndex =>
-                            m("td.line-number.top-align", { style: getCellSize(constants.cellSize), },
+                            m("td.line-number.top-align", { style: cellSize, },
                                 getRelativeLineNumber(colIndex, playerPosition.x)
                             )
                         )

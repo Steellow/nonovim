@@ -40,7 +40,6 @@ interface KeyboardBuffer {
 }
 
 interface GameConstants {
-    cellSize: number;
     rowClueAreaWidth: number;
     colClueAreaHeight: number;
     gameWidth: number;
