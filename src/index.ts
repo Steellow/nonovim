@@ -2,7 +2,7 @@ import m, { Vnode } from 'mithril';
 import { handleKeyPress } from './keyboard_handler';
 import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
 import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
-import { getCellSize, loop } from './table_utils';
+import { getBlankTable, getCellSize, loop } from './table_utils';
 
 
 const Game = () => {
@@ -62,11 +62,7 @@ const Game = () => {
                 m("div.row", [
 
                     // Empty space on top left
-                    m("table.blank", loop(con.colClueAreaHeight).map(_ =>
-                        m("tr.blank", loop(con.rowClueAreaWidth).map(_ =>
-                            m("td.blank", { style: cellSize })
-                        ))
-                    )),
+                    getBlankTable(con.rowClueAreaWidth, con.colClueAreaHeight, cellSize),
 
                     // Column (top) clues
                     m("table", loop(con.colClueAreaHeight).map(nthClueFromTop =>
@@ -140,11 +136,7 @@ const Game = () => {
                 m("div.row", [
 
                     // Bottom left empty space
-                    m("table.blank",
-                        m("tr.blank", loop(con.rowClueAreaWidth).map(_ =>
-                            m("td.blank", { style: cellSize })
-                        ))
-                    ),
+                    getBlankTable(con.rowClueAreaWidth, 1, cellSize),
 
                     // Column line numbers
                     m("table.line-number",

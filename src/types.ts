@@ -51,3 +51,9 @@ type CellValue = number | "×" | null
 type ActionKeyCodes = "KeyS" | "KeyD" | "KeyF"
 
 type MoveDirection = "left" | "right" | "up" | "down"
+
+// cell size html style object, contains width & height in pixels
+interface CellSize {
+    width: string,
+    height: string,
+}
