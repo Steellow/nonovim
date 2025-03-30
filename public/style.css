@@ -62,6 +62,7 @@ td.crossed::after {
 
 td.clue-crossed {
     position: relative;
+    color: grey;
 }
 
 td.clue-crossed::before {
