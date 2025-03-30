@@ -3,7 +3,7 @@ import { handleKeyPress } from './keyboard_handler';
 import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
 import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
 import { getCellSize, loop } from './table_utils';
-import { getKeyboardBufferText } from './keyboard_helper_utils';
+import { getHelpDialog, getKeyboardBufferText } from './keyboard_helper_utils';
 
 
 const Game = () => {
@@ -145,8 +145,11 @@ const Game = () => {
                                 getRelativeLineNumber(rowIndex, playerPosition.y)
                             )
                         )
-                    )
-                    )
+                    ),
+                    ),
+
+                    // Help dialog
+                    getHelpDialog(keyboardBuffer)
                 ]),
 
                 m("div.row", [

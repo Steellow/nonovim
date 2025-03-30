@@ -113,3 +113,25 @@ td.line-number {
     font-size: small;
     color: darkgreen;
 }
+
+.help {
+    margin-left: 20px;
+    border: 1px solid black;
+}
+
+.help p {
+    margin: 5px 10px 5px 10px;
+}
+
+.help p.sub {
+    margin: 0px 10px 0px 20px;
+}
+
+.help p.divider {
+    padding-top: 5px;
+    border-top: 1px dotted black;
+}
+
+.help p.bold {
+    font-weight: bolder;
+}
