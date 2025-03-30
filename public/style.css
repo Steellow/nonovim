@@ -105,3 +105,10 @@ td.line-number {
     vertical-align: top;
     padding-top: 2px;
 }
+
+.keyboard-buffer-text {
+    position: absolute;
+    white-space: nowrap;
+    font-size: small;
+    color: darkgreen;
+}

@@ -3,6 +3,7 @@ import { handleKeyPress } from './keyboard_handler';
 import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
 import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
 import { getBlankTable, getCellSize, loop } from './table_utils';
+import { getKeyboardBufferText } from './keyboard_helper_utils';
 
 
 const Game = () => {
@@ -36,10 +37,9 @@ const Game = () => {
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {
-        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, con, cluesWithState)) {
-            console.debug("Redrawing UI");
-            m.redraw()
-        }
+        handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, con, cluesWithState)
+        console.debug("Redrawing UI");
+        m.redraw()
     }
 
     const cellSize = getCellSize(25)
@@ -62,7 +62,25 @@ const Game = () => {
                 m("div.row", [
 
                     // Empty space on top left
-                    getBlankTable(con.rowClueAreaWidth, con.colClueAreaHeight, cellSize),
+                    m("table.blank", loop(con.colClueAreaHeight).map(y =>
+                        m("tr.blank", loop(con.rowClueAreaWidth).map(x => {
+                            const isFirstCol = x === 0
+                            const isLastRow = y === con.colClueAreaHeight - 1
+
+                            const bufferText = isFirstCol && isLastRow ? getKeyboardBufferText(keyboardBuffer) : ""
+
+                            return m(
+                                "td.blank",
+                                {
+                                    style: cellSize,
+                                },
+                                m("div.keyboard-buffer-text", bufferText)
+                            )
+                        }
+                        ))
+                    )),
+
+                    // getBlankTable(con.rowClueAreaWidth, con.colClueAreaHeight, cellSize),
 
                     // Column (top) clues
                     m("table", loop(con.colClueAreaHeight).map(nthClueFromTop =>
@@ -136,7 +154,11 @@ const Game = () => {
                 m("div.row", [
 
                     // Bottom left empty space
-                    getBlankTable(con.rowClueAreaWidth, 1, cellSize),
+                    m("table.blank",
+                        m("tr.blank", loop(con.rowClueAreaWidth).map(_ =>
+                            m("td.blank", { style: cellSize })
+                        ))
+                    ),
 
                     // Column line numbers
                     m("table.line-number",

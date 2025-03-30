@@ -30,8 +30,6 @@ export const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, 
  * Also checks clue states
  */
 export const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants, gameBoard: GameBoard, direction: MoveDirection, clues: CluesWithState) => {
-    let renderUi = false
-
     const boundaryCheck = getMovementBoundaryCheck(direction, position, constants)
 
     // Save pending action and remove it from state
@@ -60,15 +58,12 @@ export const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, c
                     i === keyboardBuffer.repeat - 1
                 )
             }
-
-            renderUi = true
         } else {
             break
         }
     }
 
     keyboardBuffer.repeat = 1
-    return renderUi
 }
 
 const getMovementBoundaryCheck = (direction: MoveDirection, position: PlayerPosition, constants: GameConstants): () => boolean => {

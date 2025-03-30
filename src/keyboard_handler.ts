@@ -1,52 +1,57 @@
 import { checkCluesForRowAndColumn } from "./clue_utils";
 import { changeCellState, move } from "./gameboard_utils";
 
-// Returns true if UI should be redrawn
-export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants, clues: CluesWithState): boolean {
+export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants, clues: CluesWithState) {
     e.preventDefault()
 
     // <num> already pressed, then <action>
     if (keyboardBuffer.repeat > 1 && actionKeyPressed(e.code)) {
         storeAction(e.code as ActionKeyCodes, keyboardBuffer)
         console.debug(keyboardBuffer);
-        return false
+        return
     }
 
     switch (e.code) {
 
         // Basic movement (HJKL)
         case "KeyH":
-            return move(position, keyboardBuffer, constants, gameBoard, "left", clues)
+            move(position, keyboardBuffer, constants, gameBoard, "left", clues)
+            break
 
         case "KeyJ":
-            return move(position, keyboardBuffer, constants, gameBoard, "down", clues)
+            move(position, keyboardBuffer, constants, gameBoard, "down", clues)
+            break
 
         case "KeyK":
-            return move(position, keyboardBuffer, constants, gameBoard, "up", clues)
+            move(position, keyboardBuffer, constants, gameBoard, "up", clues)
+            break
 
         case "KeyL":
-            return move(position, keyboardBuffer, constants, gameBoard, "right", clues)
+            move(position, keyboardBuffer, constants, gameBoard, "right", clues)
+            break
 
 
         // Basic cell action (fill, cross, clear)
         case "KeyF":
-            return changeCellState(gameBoard, position, 1, clues, true)
+            changeCellState(gameBoard, position, 1, clues, true)
+            break
 
         case "KeyD":
-            return changeCellState(gameBoard, position, 2, clues, true)
+            changeCellState(gameBoard, position, 2, clues, true)
+            break
 
         case "KeyS":
-            return changeCellState(gameBoard, position, 0, clues, true)
+            changeCellState(gameBoard, position, 0, clues, true)
+            break
 
         default:
             // Store repeat action
             if (e.code.startsWith("Digit") && e.code !== "Digit0") {
                 keyboardBuffer.repeat = Number(e.code.slice(-1))
-                return false
+                return
             }
+            break
     }
-
-    return false
 }
 
 const actionKeyPressed = (keyCode: string) => ["KeyS", "KeyD", "KeyF"].includes(keyCode)
