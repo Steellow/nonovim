@@ -57,6 +57,8 @@ export const checkCluesForRowAndColumn = (clues: CluesWithState, gameBoard: Cell
 
 // Checks if clues are crossed for single column or row
 export const checkSingleRowClues = (clues: ClueWithState[], gameBoardRow: CellState[]) => {
+    console.debug("checkSingleRowClues called")
+
     resetClueStates(clues)
 
     let mismatchingSequenceFound = false
@@ -82,6 +84,8 @@ export const checkSingleRowClues = (clues: ClueWithState[], gameBoardRow: CellSt
 
 // checkSingleRowClues, but starts form the other end 
 const checkSingleRowCluesReversed = (clues: ClueWithState[], gameBoardRow: CellState[]) => {
+    console.debug("checkSingleRowCluesReversed called")
+
     let mismatchingSequenceFound = false
     const sequences = getRowFilledCellSequences([...gameBoardRow].reverse())
 
@@ -103,6 +107,7 @@ const checkSingleRowCluesReversed = (clues: ClueWithState[], gameBoardRow: CellS
 /**
  * Finds fill sequences of the row/column, until the first empty cell
  * For example, row ×■■×■×■■■■×■■ would return [2, 1, 4]
+ * (or [2, 1, 4, 2] if the last ■■ is at the edge of the board)
  */
 const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
     let abort = false
@@ -112,17 +117,12 @@ const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
 
     const checkedSequences: number[] = []
 
-    gameBoardRow.forEach(state => {
+    gameBoardRow.forEach((state, index) => {
         // If no fill or cross, don't handle rest of the clues
         if (state === 0) {
             abort = true
             return
         }
-
-        // TODO: optimize, if last sequence, which ends with board bounds instead of a cross
-        // can be checked here, then on full row the .reverse() check doesn't have to be called
-        // thus increasing performance!
-
         if (abort) {
             return
         }
@@ -130,6 +130,12 @@ const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
         if (state === 1) {
             isSequence = true
             sequenceLength++
+
+            // If last cell → don't check for remaining cross
+            if (index === gameBoardRow.length - 1) {
+                checkedSequences.push(sequenceLength)
+                return
+            }
         }
 
         if (state === 2) {
