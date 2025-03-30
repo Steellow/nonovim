@@ -2,7 +2,7 @@ import m, { Vnode } from 'mithril';
 import { handleKeyPress } from './keyboard_handler';
 import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
 import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
-import { getBlankTable, getCellSize, loop } from './table_utils';
+import { getCellSize, loop } from './table_utils';
 import { getKeyboardBufferText } from './keyboard_helper_utils';
 
 
@@ -79,8 +79,6 @@ const Game = () => {
                         }
                         ))
                     )),
-
-                    // getBlankTable(con.rowClueAreaWidth, con.colClueAreaHeight, cellSize),
 
                     // Column (top) clues
                     m("table", loop(con.colClueAreaHeight).map(nthClueFromTop =>
