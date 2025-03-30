@@ -30,11 +30,3 @@ export function getCellCssClass(
 
 export const getCellSize = (size: number) => ({ height: `${size}px`, width: `${size}px` });
 
-/**
- * 
- * @param tableIndex if top clues, use `nthClueFromLeft`, if left clues, use `nthClueFromTop`
- * @param playerPosition if top clues, use X, if left clues, use Y
- * @returns 
- */
-export const isFocusedColumn = (tableIndex: number, playerPosition: number): "focused" | "" =>
-    tableIndex === playerPosition ? "focused" : ""

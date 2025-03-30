@@ -1,4 +1,4 @@
-export function initializeEmptyBoard(clues: NonogramClues): GameBoard {
+export function initializeEmptyBoard(clues: Clues): GameBoard {
     const numRows = clues.left.length;
     const numCols = clues.top.length;
     // Initialize with '0' for empty state
@@ -27,11 +27,11 @@ export const getCellState = (rowIndex: number, colIndex: number, gameBoard: Game
 }
 
 export const getTopClue = (
-    clues: ClueSet[],
+    clues: ClueSetWithState[],
     nthClueFromLeft: number,
     nthClueFromTop: number,
     topClueAreaHeight: number
-): number | null => {
+): ClueWithState | null => {
     const cluesForThisColumn = clues[nthClueFromLeft]
     const offset = topClueAreaHeight - cluesForThisColumn.length
 
@@ -46,11 +46,11 @@ export const getTopClue = (
 // Returns the clue which should be shown in cell,
 // if no clue in that cell, returns null
 export const getLeftClue = (
-    clues: ClueSet[],
+    clues: ClueSetWithState[],
     nthClueFromLeft: number,
     nthClueFromTop: number,
     rowClueAreaWidth: number
-): number | null => {
+): ClueWithState | null => {
     const cluesForThisRow = clues[nthClueFromTop]
     const offset = rowClueAreaWidth - cluesForThisRow.length
 

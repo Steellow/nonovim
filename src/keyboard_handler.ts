@@ -1,5 +1,7 @@
+import { checkCluesForRowAndColumn } from "./clue_util";
+
 // Returns true if UI should be redrawn
-export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants): boolean {
+export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants, clues: CluesWithState): boolean {
     e.preventDefault()
 
     // <num> already pressed, then <action>
@@ -9,36 +11,31 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
         return false
     }
 
-    // <num><action> pressed, then <direction>
-    if (keyboardBuffer.repeat > 1 && keyboardBuffer.pendingAction !== null) {
-
-    }
-
     switch (e.code) {
 
         // Basic movement (HJKL)
         case "KeyH":
-            return move(position, keyboardBuffer, constants, gameBoard, "left")
+            return move(position, keyboardBuffer, constants, gameBoard, "left", clues)
 
         case "KeyJ":
-            return move(position, keyboardBuffer, constants, gameBoard, "down")
+            return move(position, keyboardBuffer, constants, gameBoard, "down", clues)
 
         case "KeyK":
-            return move(position, keyboardBuffer, constants, gameBoard, "up")
+            return move(position, keyboardBuffer, constants, gameBoard, "up", clues)
 
         case "KeyL":
-            return move(position, keyboardBuffer, constants, gameBoard, "right")
+            return move(position, keyboardBuffer, constants, gameBoard, "right", clues)
 
 
         // Basic cell action (fill, cross, clear)
         case "KeyF":
-            return changeCellState(gameBoard, position, 1)
+            return changeCellState(gameBoard, position, 1, clues, true)
 
         case "KeyD":
-            return changeCellState(gameBoard, position, 2)
+            return changeCellState(gameBoard, position, 2, clues, true)
 
         case "KeyS":
-            return changeCellState(gameBoard, position, 0)
+            return changeCellState(gameBoard, position, 0, clues, true)
 
         default:
             // Store repeat action
@@ -51,12 +48,17 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
     return false
 }
 
-const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, state: CellState): boolean => {
+const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, state: CellState, clues?: CluesWithState, shouldCheckClues: boolean = false): boolean => {
     gameBoard[position.y][position.x] = state
+
+    if (shouldCheckClues && clues !== undefined) {
+        checkCluesForRowAndColumn(clues, gameBoard, position)
+    }
+
     return true
 }
 
-const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants, gameBoard: GameBoard, direction: MoveDirection) => {
+const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants, gameBoard: GameBoard, direction: MoveDirection, clues: CluesWithState) => {
     let renderUi = false
 
     const boundaryCheck = getMovementBoundaryCheck(direction, position, constants)
@@ -68,6 +70,7 @@ const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constant
     // When painting multiple cells at a time,
     // also paint the starting position
     if (pendingAction !== null) {
+        // check clues: false
         changeCellState(gameBoard, position, pendingAction)
     }
 
@@ -78,7 +81,13 @@ const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constant
 
             // If pending action in keyboard buffer
             if (pendingAction !== null) {
-                changeCellState(gameBoard, position, pendingAction)
+                changeCellState(
+                    gameBoard,
+                    position,
+                    pendingAction,
+                    clues,
+                    i === keyboardBuffer.repeat - 1
+                )
             }
 
             renderUi = true

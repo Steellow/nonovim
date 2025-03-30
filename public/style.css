@@ -27,14 +27,6 @@ tr:nth-child(5n) {
     border-bottom: 2px solid rgb(69, 69, 69);
 }
 
-/* td:nth-child(10n + 6),
-td:nth-child(10n + 7),
-td:nth-child(10n + 8),
-td:nth-child(10n + 9),
-td:nth-child(10n + 10) {
-    background-color: lightgreen;
-} */
-
 table.blank,
 td.blank {
     /* Same as background color, to keep the spacing right */
@@ -68,9 +60,28 @@ td.crossed::after {
     content: "×";
 }
 
+td.clue-crossed {
+    position: relative;
+}
+
+td.clue-crossed::before {
+    position: absolute;
+    content: "";
+    left: 15%;
+    top: 50%;
+    right: 15%;
+    border-top: 1px solid black !important;
+
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
 /* Focused row/column, but not the player position */
 td.focused {
-    background-color: rgb(240, 229, 229);
+    background-color: rgb(240, 240, 240);
 }
 
 td.filled {

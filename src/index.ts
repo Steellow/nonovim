@@ -1,24 +1,21 @@
 import m, { Vnode } from 'mithril';
 import { getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initializeEmptyBoard, loop } from './table_utils';
-import { getCellCssClass, getCellSize, isFocusedColumn } from './styling_utils';
+import { getCellCssClass, getCellSize } from './styling_utils';
 import { handleKeyPress } from './keyboard_handler';
+import { getClueClasses, initCluesWithState } from './clue_util';
 
 
 const Game = () => {
 
-    // Temp, for game
-    // const clues: NonogramClues = {
-    //     top: [[1], [6], [1], [2]],
-    //     left: [[2], [1], [1], [1], [3], [1, 1]],
-    // }
-
-    const clues: NonogramClues = {
-        top: [[1], [2, 3], [4, 1, 1], [1, 3], [1, 1, 1, 2], [1, 1, 2], [4, 1, 1], [1, 1], [1, 1], [5], [0]],
-        left: [[3], [1, 1], [1, 1, 1], [3, 1], [5, 1], [1, 1, 1], [1, 4], [1, 1, 1], [1, 2, 2], [2, 3, 1], [0]]
+    const clues: Clues = {
+        top: [[1], [2, 3], [4, 1, 1], [1, 3], [1, 1, 1, 2], [1, 1, 2], [4, 1, 1], [1, 1], [1, 1], [5]],
+        left: [[3], [1, 1], [1, 1, 1], [3, 1], [5, 1], [1, 1, 1], [1, 4], [1, 1, 1], [1, 2, 2], [2, 3, 1]]
     }
 
-    const gameHeight = clues.left.length
-    const gameWidth = clues.top.length
+    const cluesWithState: CluesWithState = initCluesWithState(clues)
+
+    const gameHeight = cluesWithState.left.length
+    const gameWidth = cluesWithState.top.length
 
     const rowClueAreaWidth = getMaxClueLength(clues.left)
     const colClueAreaHeight = getMaxClueLength(clues.top)
@@ -48,7 +45,7 @@ const Game = () => {
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {
-        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, constants)) {
+        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, constants, cluesWithState)) {
             console.debug("Redrawing UI");
             m.redraw()
         }
@@ -80,19 +77,24 @@ const Game = () => {
 
                     // Column (top) clues
                     m("table", loop(constants.colClueAreaHeight).map(nthClueFromTop =>
-                        m("tr", loop(gameWidth).map(nthClueFromLeft =>
-                            m("td.clue",
+                        m("tr", loop(gameWidth).map(nthClueFromLeft => {
+
+                            const clue = getTopClue(
+                                cluesWithState.top,
+                                nthClueFromLeft,
+                                nthClueFromTop,
+                                constants.colClueAreaHeight
+                            )
+
+                            return m("td.clue",
                                 {
                                     style: getCellSize(constants.cellSize),
-                                    class: isFocusedColumn(nthClueFromLeft, playerPosition.x)
+                                    class: getClueClasses(nthClueFromLeft, playerPosition.x, clue)
                                 },
-                                getTopClue(
-                                    clues.top,
-                                    nthClueFromLeft,
-                                    nthClueFromTop,
-                                    constants.colClueAreaHeight
-                                )
+                                clue?.clue
                             )
+                        }
+
                         ))
                     ))
                 ]),
@@ -101,18 +103,22 @@ const Game = () => {
 
                     // Row (left) clues
                     m("table", loop(gameHeight).map(nthClueFromTop =>
-                        m("tr", loop(constants.rowClueAreaWidth).map(nthClueFromLeft =>
-                            m("td.clue", {
-                                style: getCellSize(constants.cellSize),
-                                class: isFocusedColumn(nthClueFromTop, playerPosition.y)
-                            },
-                                getLeftClue(
-                                    clues.left,
-                                    nthClueFromLeft,
-                                    nthClueFromTop,
-                                    constants.rowClueAreaWidth
-                                )
+                        m("tr", loop(constants.rowClueAreaWidth).map(nthClueFromLeft => {
+                            const clue = getLeftClue(
+                                cluesWithState.left,
+                                nthClueFromLeft,
+                                nthClueFromTop,
+                                constants.rowClueAreaWidth
                             )
+
+                            return m("td.clue", {
+                                style: getCellSize(constants.cellSize),
+                                class: getClueClasses(nthClueFromTop, playerPosition.y, clue)
+                            },
+                                clue?.clue
+                            )
+                        }
+
                         ))
                     )),
 

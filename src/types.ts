@@ -6,10 +6,22 @@ interface TableAttrs {
 // Represents all clues for a row or column
 type ClueSet = number[]
 
-interface NonogramClues {
+interface Clues {
     top: ClueSet[],
     left: ClueSet[]
 }
+
+
+interface ClueWithState {
+    clue: number,
+    crossed?: boolean
+}
+type ClueSetWithState = ClueWithState[]
+interface CluesWithState {
+    top: ClueSetWithState[],
+    left: ClueSetWithState[]
+}
+
 
 // Represents the state of a single cell (e.g., 0: empty, 1: filled, 2: marked 'X')
 type CellState = 0 | 1 | 2;
