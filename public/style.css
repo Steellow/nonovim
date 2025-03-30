@@ -99,6 +99,7 @@ td.line-number {
 td.line-number {
     font-size: medium;
     background-color: white;
+    color: darkgreen;
 }
 
 .top-align {
