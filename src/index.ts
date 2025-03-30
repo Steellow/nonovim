@@ -12,30 +12,23 @@ const Game = () => {
         left: [[3], [1, 1], [1, 1, 1], [3, 1], [5, 1], [1, 1, 1], [1, 4], [1, 1, 1], [1, 2, 2], [2, 3, 1]]
     }
 
+    const gameBoard: GameBoard = initializeEmptyBoard(clues)
     const cluesWithState: CluesWithState = initCluesWithState(clues)
 
-    const gameHeight = cluesWithState.left.length
-    const gameWidth = cluesWithState.top.length
-
-    const rowClueAreaWidth = getMaxClueLength(clues.left)
-    const colClueAreaHeight = getMaxClueLength(clues.top)
-
-    const constants: GameConstants = {
-        rowClueAreaWidth: rowClueAreaWidth,
-        colClueAreaHeight: colClueAreaHeight,
-        gameHeight: gameHeight,
-        gameWidth: gameWidth
+    // Is constants even necessary?
+    const con: GameConstants = {
+        rowClueAreaWidth: getMaxClueLength(clues.left),
+        colClueAreaHeight: getMaxClueLength(clues.top),
+        gameHeight: cluesWithState.left.length,
+        gameWidth: cluesWithState.top.length
     }
 
-    console.debug("constants: " + constants);
-
+    console.debug("constants: " + con);
 
     const playerPosition: PlayerPosition = {
         x: 0,
         y: 0
     }
-
-    const gameBoard: GameBoard = initializeEmptyBoard(clues)
 
     const keyboardBuffer: KeyboardBuffer = {
         repeat: 1,
@@ -43,7 +36,7 @@ const Game = () => {
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {
-        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, constants, cluesWithState)) {
+        if (handleKeyPress(e, playerPosition, gameBoard, keyboardBuffer, con, cluesWithState)) {
             console.debug("Redrawing UI");
             m.redraw()
         }
@@ -69,21 +62,21 @@ const Game = () => {
                 m("div.row", [
 
                     // Empty space on top left
-                    m("table.blank", loop(constants.colClueAreaHeight).map(_ =>
-                        m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
+                    m("table.blank", loop(con.colClueAreaHeight).map(_ =>
+                        m("tr.blank", loop(con.rowClueAreaWidth).map(_ =>
                             m("td.blank", { style: cellSize })
                         ))
                     )),
 
                     // Column (top) clues
-                    m("table", loop(constants.colClueAreaHeight).map(nthClueFromTop =>
-                        m("tr", loop(gameWidth).map(nthClueFromLeft => {
+                    m("table", loop(con.colClueAreaHeight).map(nthClueFromTop =>
+                        m("tr", loop(con.gameWidth).map(nthClueFromLeft => {
 
                             const clue = getTopClue(
                                 cluesWithState.top,
                                 nthClueFromLeft,
                                 nthClueFromTop,
-                                constants.colClueAreaHeight
+                                con.colClueAreaHeight
                             )
 
                             return m("td.clue",
@@ -102,13 +95,13 @@ const Game = () => {
                 m("div.row", [
 
                     // Row (left) clues
-                    m("table", loop(gameHeight).map(nthClueFromTop =>
-                        m("tr", loop(constants.rowClueAreaWidth).map(nthClueFromLeft => {
+                    m("table", loop(con.gameHeight).map(nthClueFromTop =>
+                        m("tr", loop(con.rowClueAreaWidth).map(nthClueFromLeft => {
                             const clue = getLeftClue(
                                 cluesWithState.left,
                                 nthClueFromLeft,
                                 nthClueFromTop,
-                                constants.rowClueAreaWidth
+                                con.rowClueAreaWidth
                             )
 
                             return m("td.clue", {
@@ -123,8 +116,8 @@ const Game = () => {
                     )),
 
                     // Play area
-                    m("table", loop(gameHeight).map(rowIndex =>
-                        m("tr", loop(gameWidth).map(colIndex => m("td", {
+                    m("table", loop(con.gameHeight).map(rowIndex =>
+                        m("tr", loop(con.gameWidth).map(colIndex => m("td", {
                             style: cellSize,
                             className: getCellClasses(gameBoard, playerPosition, rowIndex, colIndex)
                         },
@@ -134,7 +127,7 @@ const Game = () => {
                     )),
 
                     // Row line numbers
-                    m("table.line-number", loop(gameHeight).map(rowIndex =>
+                    m("table.line-number", loop(con.gameHeight).map(rowIndex =>
                         m("tr.line-number",
                             m("td.line-number",
                                 getRelativeLineNumber(rowIndex, playerPosition.y)
@@ -148,14 +141,14 @@ const Game = () => {
 
                     // Bottom left empty space
                     m("table.blank",
-                        m("tr.blank", loop(constants.rowClueAreaWidth).map(_ =>
+                        m("tr.blank", loop(con.rowClueAreaWidth).map(_ =>
                             m("td.blank", { style: cellSize })
                         ))
                     ),
 
                     // Column line numbers
                     m("table.line-number",
-                        m("tr.line-number", loop(gameWidth).map(colIndex =>
+                        m("tr.line-number", loop(con.gameWidth).map(colIndex =>
                             m("td.line-number.top-align", { style: cellSize, },
                                 getRelativeLineNumber(colIndex, playerPosition.x)
                             )
