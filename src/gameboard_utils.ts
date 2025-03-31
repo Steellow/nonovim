@@ -28,8 +28,17 @@ export const changeCellState = (gameBoard: GameBoard, position: PlayerPosition, 
 /**
  * Moves player to given direction x times (times from keyboardBuffer)
  * Also checks clue states
+ * @param position current player position
+ * @param keyboardBuffer moves `repeat` amount, also changes cell state if `pendingAction` is not null
  */
-export const move = (position: PlayerPosition, keyboardBuffer: KeyboardBuffer, constants: GameConstants, gameBoard: GameBoard, direction: MoveDirection, clues: CluesWithState) => {
+export const move = (
+    position: PlayerPosition,
+    keyboardBuffer: KeyboardBuffer,
+    constants: GameConstants,
+    gameBoard: GameBoard,
+    direction: MoveDirection,
+    clues: CluesWithState
+) => {
     const boundaryCheck = getMovementBoundaryCheck(direction, position, constants)
 
     // Save pending action and remove it from state
@@ -108,29 +117,74 @@ const moveToDirection = (direction: MoveDirection, position: PlayerPosition) => 
 export function getCellClasses(
     gameBoard: GameBoard,
     position: PlayerPosition,
-    rowIndex: number,
-    colIndex: number,
+    tableY: number,
+    tableX: number,
+    keyboardBuffer: KeyboardBuffer,
+    appendNumber: string | null
 ): string {
 
-    const classes = []
+    let classes = ""
 
-    if (isPlayerPosition(rowIndex, colIndex, position)) {
-        classes.push("player-position")
+    if (isPlayerPosition(tableY, tableX, position)) {
+        classes += " player-position"
     }
 
-    if (isFocusedRowOrCol(rowIndex, colIndex, position)) {
-        classes.push("focused")
+    if (isFocusedRowOrCol(tableY, tableX, position)) {
+        classes += " focused"
     }
 
-    const cellState = getCellState(rowIndex, colIndex, gameBoard)
+    const cellState = getCellState(tableY, tableX, gameBoard)
     if (cellState === 1) {
-        classes.push("filled")
+        classes += " filled"
     } else if (cellState === 2) {
-        classes.push("crossed")
+        classes += " crossed"
     }
 
+    if (keyboardBuffer.appending && keyboardBuffer.appendingDirection === undefined) {
+        classes += getAppendingCursorClass(position, tableY, tableX)
+    }
 
-    return classes.join(" ")
+    if (appendNumber) {
+        classes += " appending"
+    }
+
+    return classes
+}
+
+// TODO: Don't use css class, return the actual letter!
+const getAppendingCursorClass = (position: PlayerPosition,
+    tableY: number,
+    tableX: number): string => {
+    if (position.y === tableY) {
+        if (position.x === tableX - 1) {
+            return " appending cursor-guide-L"
+        } else if (position.x === tableX + 1) {
+            return " appending cursor-guide-H"
+        }
+    } else if (position.x === tableX) {
+        if (position.y === tableY - 1) {
+            return " appending cursor-guide-J"
+        } else if (position.y === tableY + 1) {
+            return " appending cursor-guide-K"
+        }
+    }
+
+    return ""
+}
+
+export const getAppendNumbers = (position: PlayerPosition,
+    tableY: number,
+    tableX: number,
+    appendingDirection: MoveDirection | undefined): string | null => {
+    switch (appendingDirection) {
+        case "down":
+            if (tableX === position.x && tableY > position.y) {
+                return "" + (Math.abs(position.y - tableY) + 1)
+            }
+
+        default:
+            return null
+    }
 }
 
 export function initializeEmptyBoard(clues: Clues): GameBoard {
@@ -146,4 +200,8 @@ export const isFocusedRowOrCol = (cellRowIndex: number, cellColIndex: number, pl
 
 export const getCellState = (rowIndex: number, colIndex: number, gameBoard: GameBoard): CellState => {
     return gameBoard[rowIndex][colIndex]
+}
+
+export const getCellStateUnderCursor = (playerPosition: PlayerPosition, gameBoard: GameBoard): CellState => {
+    return gameBoard[playerPosition.y][playerPosition.x] as CellState
 }

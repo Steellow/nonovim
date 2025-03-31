@@ -1,4 +1,3 @@
-import { checkCluesForRowAndColumn } from "./clue_utils";
 import { changeCellState, move } from "./gameboard_utils";
 
 export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameBoard: GameBoard, keyboardBuffer: KeyboardBuffer, constants: GameConstants, clues: CluesWithState) {
@@ -8,6 +7,32 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
     if (keyboardBuffer.repeat > 1 && actionKeyPressed(e.code)) {
         storeAction(e.code as ActionKeyCodes, keyboardBuffer)
         console.debug(keyboardBuffer);
+        return
+    }
+
+    // APPENDING
+
+    // 1. Start appending selection (POC: only work for F)
+    if (keyboardBuffer.repeat === 1 && e.code === "KeyF" && gameBoard[position.y][position.x] === 1) {
+        keyboardBuffer.appending = true
+        return
+    }
+
+    // 2. Choose direction
+    if (keyboardBuffer.appending && moveKeyPressed(e.code)) {
+        keyboardBuffer.appendingDirection = moveKeyToMoveDirection(e.code)
+        console.debug(keyboardBuffer);
+        return
+    }
+
+    // 3. Choose amount
+    if (keyboardBuffer.appending && keyboardBuffer.appendingDirection && numberPressed(e.code)) {
+        keyboardBuffer.pendingAction = 1
+        keyboardBuffer.repeat = getNumber(e.code) - 1
+        move(position, keyboardBuffer, constants, gameBoard, keyboardBuffer.appendingDirection, clues)
+
+        keyboardBuffer.appending = false
+        keyboardBuffer.appendingDirection = undefined
         return
     }
 
@@ -46,15 +71,38 @@ export function handleKeyPress(e: KeyboardEvent, position: PlayerPosition, gameB
 
         default:
             // Store repeat action
-            if (e.code.startsWith("Digit") && e.code !== "Digit0") {
-                keyboardBuffer.repeat = Number(e.code.slice(-1))
+            if (numberPressed(e.code)) {
+                keyboardBuffer.repeat = getNumber(e.code)
                 return
             }
             break
     }
 }
 
+const numberPressed = (keyCode: string) => keyCode.startsWith("Digit") && keyCode !== "Digit0"
+const getNumber = (keyCode: string) => Number(keyCode.slice(-1))
+
 const actionKeyPressed = (keyCode: string) => ["KeyS", "KeyD", "KeyF"].includes(keyCode)
+const moveKeyPressed = (keyCode: string) => ["KeyH", "KeyJ", "KeyK", "KeyL"].includes(keyCode)
+
+const moveKeyToMoveDirection = (keyCode: string): MoveDirection | undefined => {
+    switch (keyCode) {
+        case "KeyH":
+            return "left"
+
+        case "KeyJ":
+            return "down"
+
+        case "KeyK":
+            return "up"
+
+        case "KeyL":
+            return "right"
+    }
+
+    // TODO: error handling, shouldn't reach here!
+    return undefined
+}
 
 const storeAction = (keyCode: ActionKeyCodes, keyboardBuffer: KeyboardBuffer) => {
     switch (keyCode) {

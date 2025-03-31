@@ -90,6 +90,32 @@ td.filled {
     box-shadow: inset 0 0 0 2px white;
 }
 
+td.appending {
+    background-color: lightblue;
+    position: relative;
+}
+
+td.appending::after {
+    z-index: 1;
+    pointer-events: none;
+}
+
+td.cursor-guide-H::after {
+    content: "H";
+}
+
+td.cursor-guide-J::after {
+    content: "J";
+}
+
+td.cursor-guide-K::after {
+    content: "K";
+}
+
+td.cursor-guide-L::after {
+    content: "L";
+}
+
 table.line-number,
 tr.line-number,
 td.line-number {

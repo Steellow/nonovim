@@ -36,7 +36,12 @@ interface PlayerPosition {
 
 interface KeyboardBuffer {
     repeat: number;
-    pendingAction: CellState | null
+    pendingAction: CellState | null;
+
+    // If user is appending current cell state
+    // (like pressing F again on filled cell)
+    appending: boolean;
+    appendingDirection?: MoveDirection;
 }
 
 interface GameConstants {

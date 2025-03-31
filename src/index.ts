@@ -1,7 +1,7 @@
 import m, { Vnode } from 'mithril';
 import { handleKeyPress } from './keyboard_handler';
 import { getClueClasses, getLeftClue, getMaxClueLength, getRelativeLineNumber, getTopClue, initCluesWithState } from './clue_utils';
-import { getCellClasses, initializeEmptyBoard } from './gameboard_utils';
+import { getAppendNumbers, getCellClasses, getCellStateUnderCursor, initializeEmptyBoard } from './gameboard_utils';
 import { getCellSize, loop } from './table_utils';
 import { getHelpDialog, getKeyboardBufferText } from './keyboard_helper_utils';
 
@@ -33,7 +33,8 @@ const Game = () => {
 
     const keyboardBuffer: KeyboardBuffer = {
         repeat: 1,
-        pendingAction: null
+        pendingAction: null,
+        appending: false, // support other types as well
     }
 
     const handleKeypressWrapper = (e: KeyboardEvent) => {
@@ -128,13 +129,25 @@ const Game = () => {
                     )),
 
                     // Play area
-                    m("table", loop(con.gameHeight).map(rowIndex =>
-                        m("tr", loop(con.gameWidth).map(colIndex => m("td", {
-                            style: cellSize,
-                            className: getCellClasses(gameBoard, playerPosition, rowIndex, colIndex)
-                        },
-                            // colIndex + "," + rowIndex
-                        )
+                    m("table", loop(con.gameHeight).map(tableY =>
+                        m("tr", loop(con.gameWidth).map(tableX => {
+                            const appendNumber = getAppendNumbers(playerPosition, tableY, tableX, keyboardBuffer.appendingDirection)
+
+                            return m("td", {
+                                style: cellSize,
+                                class: getCellClasses(
+                                    gameBoard,
+                                    playerPosition,
+                                    tableY,
+                                    tableX,
+                                    keyboardBuffer,
+                                    appendNumber
+                                )
+                            },
+                                // colIndex + "," + rowIndex
+                                appendNumber
+                            )
+                        }
                         ))
                     )),
 
@@ -149,7 +162,10 @@ const Game = () => {
                     ),
 
                     // Help dialog
-                    getHelpDialog(keyboardBuffer)
+                    getHelpDialog(
+                        keyboardBuffer,
+                        getCellStateUnderCursor(playerPosition, gameBoard)
+                    )
                 ]),
 
                 m("div.row", [
