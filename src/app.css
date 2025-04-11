@@ -1,0 +1,40 @@
+:root {
+	--td-width: 25px;
+	--td-height: 25px;
+}
+
+body {
+	font-family: monospace;
+}
+
+.row {
+	display: flex;
+}
+
+td,
+th,
+table {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 5px;
+	text-align: center;
+}
+
+td {
+	font-size: large;
+	width: var(--td-width);
+	height: var(--td-height);
+}
+
+td:nth-child(5n) {
+	border-right: 2px solid rgb(69, 69, 69);
+}
+
+tr:nth-child(5n) {
+	border-bottom: 2px solid rgb(69, 69, 69);
+}
+
+/* Focused row/column, but not the player position */
+td.focused {
+	background-color: rgb(240, 240, 240);
+}

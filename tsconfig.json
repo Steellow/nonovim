@@ -1,24 +1,19 @@
 {
-    "compilerOptions": {
-        "target": "ES6", // Target modern browsers
-        "module": "ESNext", // Use modern module system
-        "moduleResolution": "node", // How modules are found
-        "outDir": "public/dist", // Where to output compiled JS
-        "rootDir": "src", // Root directory of source files
-        "strict": true, // Enable strict type-checking
-        "esModuleInterop": true, // Allows default imports from commonjs modules
-        "skipLibCheck": true, // Skip type checking of declaration files
-        "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references
-        "lib": [
-            "DOM",
-            "ESNext"
-        ], // Include standard browser and ESNext libraries
-        "sourceMap": true // Generate source maps for debugging
-    },
-    "include": [
-        "src/**/*"
-    ], // Which files to compile
-    "exclude": [
-        "node_modules"
-    ] // Which files/directories to ignore
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"moduleResolution": "bundler"
+	}
+	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
+	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
+	//
+	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
+	// from the referenced tsconfig.json - TypeScript does not merge them in
 }

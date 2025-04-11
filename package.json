@@ -1,21 +1,36 @@
 {
-  "name": "nonovim",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=public/dist/bundle.js --platform=browser --sourcemap",
-    "start": "npm run build && npx serve public",
-    "dev": "esbuild src/index.ts --bundle --outfile=public/dist/bundle.js --platform=browser --sourcemap --watch"
-  },
-  "author": "hanki.dev",
-  "license": "ISC",
-  "description": "Nonogram app with vim-like keybindings",
-  "dependencies": {
-    "mithril": "^2.2.15"
-  },
-  "devDependencies": {
-    "@types/mithril": "^2.2.7",
-    "esbuild": "^0.25.1",
-    "typescript": "^5.8.2"
-  }
+	"name": "nonovim-svelte",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write .",
+		"lint": "prettier --check . && eslint ."
+	},
+	"devDependencies": {
+		"@eslint/compat": "^1.2.5",
+		"@eslint/js": "^9.18.0",
+		"@sveltejs/adapter-auto": "^4.0.0",
+		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@typescript-eslint/eslint-plugin": "^8.29.1",
+		"@typescript-eslint/parser": "^8.29.1",
+		"eslint": "^9.24.0",
+		"eslint-config-prettier": "^10.1.2",
+		"eslint-plugin-svelte": "^3.0.0",
+		"globals": "^16.0.0",
+		"prettier": "^3.5.3",
+		"prettier-plugin-svelte": "^3.3.3",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.20.0",
+		"vite": "^6.0.0"
+	}
 }
