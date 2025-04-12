@@ -3,6 +3,7 @@
 	import GameBoard from '$lib/components/GameBoard.svelte';
 	import LeftTopBlankArea from '$lib/components/LeftTopBlankArea.svelte';
 	import { handleKeydown } from '$lib/utils/keyboard_handler.svelte';
+	import "../app.css"
 
 	$effect.root(() => {
 		console.log('Adding global keydown listener');
