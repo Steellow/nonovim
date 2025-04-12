@@ -4,9 +4,6 @@
 	import LeftTopBlankArea from '$lib/components/LeftTopBlankArea.svelte';
 	import { handleKeydown } from '$lib/utils/keyboard_handler.svelte';
 
-	// For GitHub pages
-	export const prerender = true;
-
 	$effect.root(() => {
 		console.log('Adding global keydown listener');
 		window.addEventListener('keydown', handleKeydown);
