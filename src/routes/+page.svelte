@@ -6,6 +6,7 @@
   import { handleKeydown } from "$lib/utils/keyboard_handler.svelte";
   import "../app.css";
   import BlankArea from "$lib/components/BlankArea.svelte";
+  import HelpDialog from "$lib/components/HelpDialog.svelte";
 
   $effect.root(() => {
     console.log("Adding global keydown listener");
@@ -29,6 +30,7 @@
   <Clues cluesPosition="left" />
   <GameBoard />
   <LineNumbers lineNumbersPosition="right" />
+  <HelpDialog />
 </div>
 <div class="row">
   <BlankArea width={leftClueAreaWidth} height={1} />
