@@ -157,11 +157,13 @@
   }
 
   td.filled {
-    background-color: rgb(69, 69, 69);
+    background-color: rgb(69, 69, 69) !important;
     box-shadow: inset 0 0 0 2px white;
+    color: white;
   }
 
   td.appending {
-    background-color: blueviolet;
+    background-color: lightskyblue;
+    box-shadow: inset 0 0 0 2px white;
   }
 </style>
