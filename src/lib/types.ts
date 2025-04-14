@@ -26,8 +26,8 @@ interface CluesWithState {
   left: ClueSetWithState[];
 }
 
-// Represents the state of a single cell (e.g., 0: empty, 1: filled, 2: marked 'X')
-type CellState = 0 | 1 | 2;
+// TODO: These are good when handling values, but actualy array should probably only contain integers for performance?
+type CellState = "empty" | "filled" | "x";
 
 // Represents the game board grid
 type GameBoard = CellState[][];
@@ -41,10 +41,9 @@ interface KeyboardBuffer {
   repeat: number;
   pendingAction: CellState | null;
 
-  // If user is appending current cell state
-  // (like pressing F again on filled cell)
-  appending: boolean;
-  appendingDirection?: MoveDirection;
+  appending: CellState | null;
+  appendDirection: MoveDirection | null;
+  appendAmount: number;
 }
 
 type CellValue = number | "×" | null;

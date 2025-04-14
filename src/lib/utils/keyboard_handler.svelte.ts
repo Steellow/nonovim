@@ -9,13 +9,44 @@ import { gameBoard, playerPosition } from "$lib/state.svelte";
 export const handleKeydown = (e: KeyboardEvent) => {
   e.preventDefault();
 
+  console.log(keyboardBuffer.appending);
+
   const key = e.key.toLocaleLowerCase();
   console.debug("Key pressed (lowercased):", key);
 
-  // <num> already pressed, then <action>
-  if (keyboardBuffer.repeat > 1 && actionKeyPressed(e.key)) {
-    storeAction(key as ActionKeyCodes, keyboardBuffer);
-    console.debug(keyboardBuffer);
+  if (actionKeyPressed(key)) {
+    // <num> already pressed, then <action>
+    // Should this be deprecated?
+    if (keyboardBuffer.repeat > 1) {
+      storeAction(key as ActionKeyCodes, keyboardBuffer);
+      console.debug(keyboardBuffer);
+      return;
+    }
+
+    // APPEDNING
+    const cellStateUnderCursor = getCellStateUnderCursor();
+
+    // 1. Start appending
+    if (cellStateUnderCursor === actionKeyToCellState(key)) {
+      keyboardBuffer.appending = cellStateUnderCursor;
+      return;
+    }
+
+    // 2. Choose appending direction
+  } else if (keyboardBuffer.appending && moveKeyPressed(key)) {
+    keyboardBuffer.appendDirection = moveKeyToMoveDirection(key);
+    keyboardBuffer.appendAmount = 1;
+    return;
+
+    // 3. Press a number
+  } else if (keyboardBuffer.appendDirection !== null && numberPressed(key)) {
+    keyboardBuffer.pendingAction = keyboardBuffer.appending;
+    keyboardBuffer.repeat = Number(key);
+    move(keyboardBuffer.appendDirection);
+
+    keyboardBuffer.appending = null;
+    keyboardBuffer.appendDirection = null;
+
     return;
   }
 
@@ -43,20 +74,20 @@ export const handleKeydown = (e: KeyboardEvent) => {
 
     // Basic cell action (fill, cross, clear)
     case "f":
-      changeCellState(1, true);
+      changeCellState("filled", true);
       break;
 
     case "d":
-      changeCellState(2, true);
+      changeCellState("x", true);
       break;
 
     case "s":
-      changeCellState(0, true);
+      changeCellState("empty", true);
       break;
 
     default:
       // Store repeat action
-      if (!Number.isNaN(key)) {
+      if (numberPressed(key)) {
         keyboardBuffer.repeat = Number(key);
         return;
       }
@@ -65,19 +96,56 @@ export const handleKeydown = (e: KeyboardEvent) => {
 };
 
 const actionKeyPressed = (key: string) => ["s", "d", "f"].includes(key);
+const moveKeyPressed = (key: string) => ["h", "j", "k", "l"].includes(key);
+const numberPressed = (key: string) => !Number.isNaN(key);
+
+const actionKeyToCellState = (key: string): CellState => {
+  switch (key) {
+    case "s":
+      return "empty";
+
+    case "d":
+      return "x";
+
+    case "f":
+      return "filled";
+
+    default:
+      throw Error(`Cannot map key ${key} to CellState`);
+  }
+};
+
+const moveKeyToMoveDirection = (key: string): MoveDirection => {
+  switch (key) {
+    case "h":
+      return "left";
+
+    case "j":
+      return "down";
+
+    case "k":
+      return "up";
+
+    case "l":
+      return "right";
+
+    default:
+      throw Error(`Cannot map key ${key} to MoveDirection`);
+  }
+};
 
 const storeAction = (key: ActionKeyCodes, keyboardBuffer: KeyboardBuffer) => {
   switch (key) {
     case "s":
-      keyboardBuffer.pendingAction = 0;
+      keyboardBuffer.pendingAction = "empty";
       break;
 
     case "d":
-      keyboardBuffer.pendingAction = 2;
+      keyboardBuffer.pendingAction = "x";
       break;
 
     case "f":
-      keyboardBuffer.pendingAction = 1;
+      keyboardBuffer.pendingAction = "filled";
       break;
 
     default:
@@ -245,7 +313,7 @@ const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
 
   gameBoardRow.forEach((state, index) => {
     // If no fill or cross, don't handle rest of the clues
-    if (state === 0) {
+    if (state === "empty") {
       abort = true;
       return;
     }
@@ -253,7 +321,7 @@ const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
       return;
     }
 
-    if (state === 1) {
+    if (state === "filled") {
       isSequence = true;
       sequenceLength++;
 
@@ -264,7 +332,7 @@ const getRowFilledCellSequences = (gameBoardRow: CellState[]): number[] => {
       }
     }
 
-    if (state === 2) {
+    if (state === "x") {
       if (isSequence) {
         checkedSequences.push(sequenceLength);
         isSequence = false;
@@ -303,3 +371,6 @@ const moveToDirection = (direction: MoveDirection) => {
   }
   console.log(playerPosition.x + ", " + playerPosition.y);
 };
+
+const getCellStateUnderCursor = (): CellState =>
+  gameBoard[playerPosition.y][playerPosition.x];

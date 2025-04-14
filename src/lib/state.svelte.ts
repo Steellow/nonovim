@@ -46,7 +46,9 @@ export const cellSize = 25;
 export const keyboardBuffer: KeyboardBuffer = $state({
   repeat: 1,
   pendingAction: null,
-  appending: false,
+  appending: null,
+  appendDirection: null,
+  appendAmount: 0,
 });
 
 // TODO: Scaling doesn't work properly at the moment

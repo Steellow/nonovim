@@ -17,9 +17,6 @@
       window.removeEventListener("keydown", handleKeydown);
     };
   });
-
-  // TODO: just use runes here, instead of store? or state.svelte.ts?
-  // see https://svelte.dev/docs/svelte/stores
 </script>
 
 <div class="row">

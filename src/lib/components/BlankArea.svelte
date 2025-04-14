@@ -1,9 +1,5 @@
 <script>
-  import {
-    keyboardBuffer,
-    leftClueAreaWidth,
-    topClueAreaHeight,
-  } from "$lib/state.svelte";
+  import { keyboardBuffer, topClueAreaHeight } from "$lib/state.svelte";
   import { getKeyboardBufferText } from "$lib/utils/keyboard_helper_utils";
   import { loop } from "$lib/utils/table_utils";
 
