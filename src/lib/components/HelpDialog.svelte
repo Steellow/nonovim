@@ -11,13 +11,18 @@
 
 <div class="help">
   <p class={moveTextClass}>[HJKL] to move</p>
-  <p class={actionTextClass}>[FDS] to change cell</p>
+  <p class="sub">&lt;num&gt;[HJKL] to repeat</p>
+  <p class={actionTextClass + " divider"}>[FDS] to change cell</p>
   <p class="sub">F = fill cell</p>
   <p class="sub">D = cross cell</p>
   <p class="sub">S = clear cell</p>
-  <p class="divider">&lt;num&gt; to repeat action</p>
-  <p class="sub">3J = move down 3</p>
-  <p class="sub">3FJ = move down 3 & fill cells</p>
+  <p class="divider">[FDS] again to start appending</p>
+  <p class="sub">[HJKL] to change appending direction and range</p>
+  <p class="sub">[FDS] again to finish appending</p>
+  <p class="sub"> Or &lt;num&gt; after selecting direction</p>
+  <!-- <p class="divider">&lt;num&gt; to repeat action</p> -->
+  <!-- <p class="sub">3J = move down 3</p> -->
+  <!-- <p class="sub">3FJ = move down 3 & fill cells</p> -->
 </div>
 
 <style>
