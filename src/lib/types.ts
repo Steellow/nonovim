@@ -41,9 +41,8 @@ interface KeyboardBuffer {
   repeat: number;
   pendingAction: CellState | null;
 
-  appending: CellState | null;
+  appending: boolean;
   appendDirection: MoveDirection | null;
-  appendAmount: number;
 }
 
 type CellValue = number | "×" | null;
@@ -51,6 +50,7 @@ type CellValue = number | "×" | null;
 type ActionKeyCodes = "s" | "d" | "f";
 
 type MoveDirection = "left" | "right" | "up" | "down";
+type MoveKeys = "H" | "J" | "K" | "L";
 
 // cell size html style object, contains width & height in pixels
 interface CellSize {

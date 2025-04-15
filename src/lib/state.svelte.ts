@@ -46,7 +46,7 @@ export const cellSize = 25;
 export const keyboardBuffer: KeyboardBuffer = $state({
   repeat: 1,
   pendingAction: null,
-  appending: null,
+  appending: false,
   appendDirection: null,
   appendAmount: 0,
 });

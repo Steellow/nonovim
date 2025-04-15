@@ -3,24 +3,6 @@
   import { gameBoard, playerPosition } from "$lib/state.svelte";
   import { loop } from "$lib/utils/table_utils";
 
-  // let localPlayerPosition = $state<PlayerPosition>(get(playerPosition))
-  // $effect(() => {
-  // 	console.log("Setting up playerPositionStore subscription");
-  // 	const unsubscribe = playerPosition.subscribe(newValue => {
-  //   console.log("playerPositionStore updated:", newValue);
-  //   // Assign the new value to the $state variable. This assignment
-  //   // is tracked by Svelte 5 because 'playerPosition' uses $state.
-  //   localPlayerPosition = newValue;
-  // });
-
-  // // The effect's cleanup function: Unsubscribe when the component unmounts
-  // // or when the effect re-runs (though this one likely won't re-run)
-  // return () => {
-  //   console.log("Cleaning up playerPositionStore subscription");
-  //   unsubscribe();
-  // };
-  // })
-
   const getCellClasses = (
     tableY: number,
     tableX: number,
@@ -43,18 +25,28 @@
       classes += " crossed";
     }
 
-    if (appendValue !== null) {
+    // Appending + value in cell
+    if (appendValue === "") {
+      classes += " ghost";
+    } else if (appendValue !== null) {
       classes += " appending";
+
+      // Appending, ghost cell
+    } else if (keyboardBuffer.appendDirection !== null) {
     }
 
     return classes;
   };
 
-  const isPlayerPosition = (cellRowIndex: number, cellColIndex: number) =>
-    cellColIndex === playerPosition.x && cellRowIndex === playerPosition.y;
+  const isPlayerPosition = (tableY: number, tableX: number) =>
+    tableX === playerPosition.x && tableY === playerPosition.y;
 
-  const isFocusedRowOrCol = (cellRowIndex: number, cellColIndex: number) =>
-    cellColIndex === playerPosition.x || cellRowIndex === playerPosition.y;
+  const isFocusedRowOrCol = (tableY: number, tableX: number) =>
+    isFocusedCol(tableX) || isFocusedRow(tableY);
+
+  const isFocusedRow = (tableY: number) => tableY === playerPosition.y;
+
+  const isFocusedCol = (tableX: number) => tableX === playerPosition.x;
 
   const getCellState = (rowIndex: number, colIndex: number): CellState =>
     gameBoard[rowIndex][colIndex];
@@ -63,52 +55,78 @@
     tableY: number,
     tableX: number
   ): string | null => {
-    if (keyboardBuffer.appending === null) {
+    if (!keyboardBuffer.appending) {
       return null;
     }
 
     // 1. Appending just started
     if (keyboardBuffer.appendDirection === null) {
-      if (playerPosition.y === tableY) {
-        if (playerPosition.x === tableX - 1) {
-          return "L";
-        } else if (playerPosition.x === tableX + 1) {
-          return "H";
-        }
-      } else if (playerPosition.x === tableX) {
-        if (playerPosition.y === tableY - 1) {
-          return "J";
-        } else if (playerPosition.y === tableY + 1) {
-          return "K";
-        }
+      return getAppendHJKLGuides(tableY, tableX);
+
+      // 2. Direction choosed → show numbers
+    } else {
+      return getAppendNumbersAndGhostCells(tableY, tableX);
+    }
+  };
+
+  const getAppendHJKLGuides = (
+    tableY: number,
+    tableX: number
+  ): MoveKeys | null => {
+    if (playerPosition.y === tableY) {
+      if (playerPosition.x === tableX - 1) {
+        return "L";
+      } else if (playerPosition.x === tableX + 1) {
+        return "H";
+      }
+    } else if (playerPosition.x === tableX) {
+      if (playerPosition.y === tableY - 1) {
+        return "J";
+      } else if (playerPosition.y === tableY + 1) {
+        return "K";
       }
     }
+    return null;
+  };
 
-    // 2. Direction choosed → show numbers
-    switch (keyboardBuffer.appendDirection) {
+  const getAppendNumbersAndGhostCells = (
+    tableY: number,
+    tableX: number
+  ): string | null => {
+    let amount = null;
+
+    const { x: playerX, y: playerY } = playerPosition;
+    const { appendDirection, repeat } = keyboardBuffer;
+
+    switch (appendDirection) {
       case "left":
-        if (tableY === playerPosition.y && tableX < playerPosition.x) {
-          return (playerPosition.x - tableX).toString();
+        if (tableY === playerY && tableX < playerX) {
+          amount = playerX - tableX;
         }
         break;
 
       case "right":
-        if (tableY === playerPosition.y && tableX > playerPosition.x) {
-          return (tableX - playerPosition.x).toString();
+        if (tableY === playerY && tableX > playerX) {
+          amount = tableX - playerX;
         }
         break;
 
       case "up":
-        if (tableX === playerPosition.x && tableY < playerPosition.y) {
-          return (playerPosition.y - tableY).toString();
+        if (tableX === playerX && tableY < playerY) {
+          amount = playerY - tableY;
         }
         break;
 
       case "down":
-        if (tableX === playerPosition.x && tableY > playerPosition.y) {
-          return (tableY - playerPosition.y).toString();
+        if (tableX === playerX && tableY > playerY) {
+          amount = tableY - playerY;
         }
         break;
+    }
+
+    if (amount !== null) {
+      // Return distance string or "" (ghost cell)
+      return amount > repeat ? (amount + 1).toString() : "";
     }
 
     return null;
@@ -160,6 +178,11 @@
     background-color: rgb(69, 69, 69) !important;
     box-shadow: inset 0 0 0 2px white;
     color: white;
+  }
+
+  td.ghost {
+    background-color: rgb(111, 111, 111) !important;
+    box-shadow: inset 0 0 0 2px white;
   }
 
   td.appending {

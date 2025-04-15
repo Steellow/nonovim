@@ -9,10 +9,13 @@ import { gameBoard, playerPosition } from "$lib/state.svelte";
 export const handleKeydown = (e: KeyboardEvent) => {
   e.preventDefault();
 
-  console.log(keyboardBuffer.appending);
-
   const key = e.key.toLocaleLowerCase();
   console.debug("Key pressed (lowercased):", key);
+
+  if (keyboardBuffer.appending) {
+    handleAppend(key);
+    return;
+  }
 
   if (actionKeyPressed(key)) {
     // <num> already pressed, then <action>
@@ -23,31 +26,12 @@ export const handleKeydown = (e: KeyboardEvent) => {
       return;
     }
 
-    // APPEDNING
+    // Start appending
     const cellStateUnderCursor = getCellStateUnderCursor();
-
-    // 1. Start appending
     if (cellStateUnderCursor === actionKeyToCellState(key)) {
-      keyboardBuffer.appending = cellStateUnderCursor;
+      startAppending(cellStateUnderCursor);
       return;
     }
-
-    // 2. Choose appending direction
-  } else if (keyboardBuffer.appending && moveKeyPressed(key)) {
-    keyboardBuffer.appendDirection = moveKeyToMoveDirection(key);
-    keyboardBuffer.appendAmount = 1;
-    return;
-
-    // 3. Press a number
-  } else if (keyboardBuffer.appendDirection !== null && numberPressed(key)) {
-    keyboardBuffer.pendingAction = keyboardBuffer.appending;
-    keyboardBuffer.repeat = Number(key);
-    move(keyboardBuffer.appendDirection);
-
-    keyboardBuffer.appending = null;
-    keyboardBuffer.appendDirection = null;
-
-    return;
   }
 
   switch (key) {
@@ -95,9 +79,92 @@ export const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
+const startAppending = (stateToAppend: CellState) => {
+  keyboardBuffer.appending = true;
+  keyboardBuffer.pendingAction = stateToAppend;
+};
+
+const finishAppending = () => {
+  if (keyboardBuffer.appendDirection === null) {
+    console.log("Trying to finish appending with null direction!");
+    return;
+  }
+
+  move(keyboardBuffer.appendDirection);
+
+  keyboardBuffer.appending = false;
+  keyboardBuffer.appendDirection = null;
+};
+
+const handleAppend = (key: string) => {
+  if (moveKeyPressed(key)) {
+    const moveDirection = moveKeyToMoveDirection(key);
+
+    // 1. Choose appending direction
+    if (keyboardBuffer.appendDirection === null) {
+      keyboardBuffer.appendDirection = moveDirection;
+      keyboardBuffer.repeat = 1;
+      return;
+
+      // 2. Press direction key again → Increase appending by 1
+    } else {
+      changeAppendAmountWithDirectionKeys(moveDirection);
+      return;
+    }
+  }
+
+  // 3. Finish appending
+  else if (keyboardBuffer.appendDirection !== null) {
+    // 3a. Number pressed → append that amount + finish appending
+    if (numberPressed(key)) {
+      keyboardBuffer.repeat = Number(key) - 1;
+      finishAppending();
+      return;
+    }
+
+    // 3b. Action key pressed again
+    if (keyboardBuffer.pendingAction === actionKeyToCellState(key)) {
+      finishAppending();
+      return;
+    }
+  }
+};
+
+const changeAppendAmountWithDirectionKeys = (moveDirection: MoveDirection) => {
+  if (keyboardBuffer.appendDirection === moveDirection) {
+    keyboardBuffer.repeat = keyboardBuffer.repeat + 1;
+  } else if (
+    keyboardBuffer.appendDirection === getOppositeMoveDirection(moveDirection)
+  ) {
+    keyboardBuffer.repeat = keyboardBuffer.repeat - 1;
+    if (keyboardBuffer.repeat === 0) {
+      keyboardBuffer.appendDirection = null;
+    }
+  }
+};
+
 const actionKeyPressed = (key: string) => ["s", "d", "f"].includes(key);
 const moveKeyPressed = (key: string) => ["h", "j", "k", "l"].includes(key);
-const numberPressed = (key: string) => !Number.isNaN(key);
+const numberPressed = (key: string) =>
+  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(key);
+
+const getOppositeMoveDirection = (
+  moveDirection: MoveDirection
+): MoveDirection => {
+  switch (moveDirection) {
+    case "left":
+      return "right";
+
+    case "up":
+      return "down";
+
+    case "right":
+      return "left";
+
+    case "down":
+      return "up";
+  }
+};
 
 const actionKeyToCellState = (key: string): CellState => {
   switch (key) {
@@ -278,8 +345,6 @@ const checkSingleRowCluesReversed = (
   clueSet: ClueSetWithState,
   gameBoardRow: CellState[]
 ) => {
-  console.debug("checkSingleRowCluesReversed called");
-
   let mismatchingSequenceFound = false;
   const sequences = getRowFilledCellSequences([...gameBoardRow].reverse());
 
@@ -369,7 +434,6 @@ const moveToDirection = (direction: MoveDirection) => {
       playerPosition.y++;
       break;
   }
-  console.log(playerPosition.x + ", " + playerPosition.y);
 };
 
 const getCellStateUnderCursor = (): CellState =>

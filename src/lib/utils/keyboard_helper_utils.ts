@@ -1,40 +1,47 @@
 // this file contains help texts and stuff for shortcuts
+
+import { keyboardBuffer } from "$lib/state.svelte";
+
 // does not actually handle any keyboard presses
 export const getKeyboardBufferText = (
-	x: number,
-	y: number,
-	buffer: KeyboardBuffer,
-	colClueAreaHeight: number
+  x: number,
+  y: number,
+  buffer: KeyboardBuffer,
+  colClueAreaHeight: number
 ): string => {
-	const isFirstCol = x === 0;
-	const isLastRow = y === colClueAreaHeight - 1;
+  const isFirstCol = x === 0;
+  const isLastRow = y === colClueAreaHeight - 1;
 
-	if (!isFirstCol || !isLastRow) {
-		return '';
-	}
+  if (!isFirstCol || !isLastRow) {
+    return "";
+  }
 
-	let text = '';
+  if (keyboardBuffer.appending) {
+    return "";
+  }
 
-	if (buffer.repeat > 1) {
-		text += buffer.repeat;
-	}
+  let text = "";
 
-	if (buffer.pendingAction) {
-		text += getPendingActionLetter(buffer.pendingAction);
-	}
+  if (buffer.repeat > 1) {
+    text += buffer.repeat;
+  }
 
-	return text;
+  if (buffer.pendingAction) {
+    text += getPendingActionLetter(buffer.pendingAction);
+  }
+
+  return text;
 };
 
 const getPendingActionLetter = (pendingAction: CellState) => {
-	switch (pendingAction) {
-		case 0:
-			return 'S';
-		case 1:
-			return 'F';
-		case 2:
-			return 'D';
-	}
+  switch (pendingAction) {
+    case "empty":
+      return "S";
+    case "filled":
+      return "F";
+    case "x":
+      return "D";
+  }
 };
 
 // export const getHelpDialog = (buffer: KeyboardBuffer, currentCellState: CellState) => {
